@@ -121,13 +121,13 @@ void Player::Action()
 	Vector3 trans = m_ObjPlayer[BODY].GetTranslation();
 
 	//移動ベクトル(Z座標の前進)
-	SimpleMath::Vector3 moveV(0.0f, 0.0f, 0.0f);
+	m_moveV = Vector3(0.0f, 0.0f, 0.0f);
 
 	//移動ベクトルを回転する
-	moveV = Vector3::TransformNormal(moveV, m_ObjPlayer[BODY].GetWorld());
+	m_moveV = Vector3::TransformNormal(m_moveV, m_ObjPlayer[BODY].GetWorld());
 
 	//移動
-	trans += moveV;
+	trans += m_moveV;
 
 	//移動した座標を反映
 	m_ObjPlayer[BODY].SetTranslation(trans);
@@ -237,6 +237,12 @@ const DirectX::SimpleMath::Vector3& Player::GetTrans()
 const DirectX::SimpleMath::Matrix & Player::GetWor()
 {
 	return m_ObjPlayer[BODY].GetWorld();
+}
+
+//プレイヤーの移動ベクトルを取得する
+const DirectX::SimpleMath::Vector3& Player::GetMoveV()
+{
+	return m_moveV;
 }
 
 //プレイヤーの移動をセットする

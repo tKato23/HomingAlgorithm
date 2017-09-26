@@ -5,6 +5,7 @@
 #include <vector>
 #include "Obj3d.h"
 #include "CollisionNode.h"
+#include "Player.h"
 
 class Enemy
 {
@@ -27,33 +28,44 @@ public:
 	//エネミーの挙動
 	void Action();
 
-	//エネミーの移動を取得する
+	//エネミーの角度を取得する
 	const DirectX::SimpleMath::Vector3& GetRot();
 
-	//エネミーの角度を取得する
+	//エネミーの位置を取得する
 	const DirectX::SimpleMath::Vector3& GetTrans();
 
-	//エネミーの移動をセットする
-	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
+	//エネミーの移動ベクトルを取得する
+	const DirectX::SimpleMath::Vector3& GetMoveV();
 
 	//エネミーの角度をセットする
+	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
+
+	//エネミーの位置をセットする
 	void SetTrans(const DirectX::SimpleMath::Vector3& translation);
 
 	//エネミーの当たり判定を取得する
 	const SphereNode& GetCollisionNodeEnemy() { return m_CollisionNodeEnemy; }
 
-	//	先読み型の自動追尾
+	//先読み型の自動追尾
+	void PrefetchHoming(DirectX::SimpleMath::Vector3 targetPos);
+
+	//旋回型の自動追尾
 	void PrefetchHoming(DirectX::SimpleMath::Vector3 targetPos);
 
 private:
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjEnemy;
 
+	Player* m_Player;
+
 	// サイン用の引数となる角度
 	float m_sinAngle;
 
 	//タイマー
 	int m_Timer;
+
+	//移動ベクトル
+	DirectX::SimpleMath::Vector3 m_moveV;
 
 	//目標角度
 	float m_DistAngle;
