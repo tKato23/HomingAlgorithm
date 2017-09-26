@@ -9,6 +9,9 @@ Enemy::Enemy()
 	m_sinAngle = 0.0f;
 
 	Initialize();
+
+	//	初期化処理
+	m_Player = nullptr;
 }
 
 //デストラクタ
@@ -169,6 +172,9 @@ void Enemy::Update()
 
 	//当たり判定の更新
 	m_CollisionNodeEnemy.Update();
+
+	//	プレイヤーへの追尾
+	PrefetchHoming();
 }
 
 //行列更新
@@ -290,15 +296,29 @@ void Enemy::SetTrans(const Vector3& translation)
 //追尾ホーミング
 
 //	先読み型の自動追尾
-void Enemy::PrefetchHoming(Vector3 targetPos)
+void Enemy::PrefetchHoming()
 {
 
-	////	敵とプレイヤー座標の差
-	//Vector3 differencePos　m_player->GetTrans() - GetTrans();
+	//	敵とプレイヤー座標の差
+	Vector3 differencePos = m_Player->GetTrans() - GetTrans();
 
-	////	移動ベクトルの差
-	//Vector3 differenceVec;
+	//	移動ベクトルの差
+	Vector3 differenceVec = m_Player->GetMoveV() - GetMoveV();
 
+	//	接近時間　
+	Vector3 time = differencePos / differenceVec;
+	
+	//	目標地点
+	Vector3 targetPoint =  m_Player->GetTrans() + GetTrans() * time;
+
+	//	予測点の方向
+	Vector3 dir = targetPoint - GetTrans();
+	dir.Normalize();
+	//	敵の移動先
+	Vector3 move = dir * differencePos;
+
+	//	敵に反映させる
+	this->SetTrans(move);
 }
 
 //旋回型の自動追尾

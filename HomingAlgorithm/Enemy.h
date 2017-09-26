@@ -47,15 +47,18 @@ public:
 	const SphereNode& GetCollisionNodeEnemy() { return m_CollisionNodeEnemy; }
 
 	//先読み型の自動追尾
-	void PrefetchHoming(DirectX::SimpleMath::Vector3 targetPos);
+	void PrefetchHoming();
 
 	//旋回型の自動追尾
 	void TurnHoming(DirectX::SimpleMath::Vector3 targetPos);
+
+	void SetPlayer(Player* player) { m_Player = player; }				//プレイヤーをセット
 
 private:
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjEnemy;
 
+	//	プレイヤー
 	Player* m_Player;
 
 	// サイン用の引数となる角度
