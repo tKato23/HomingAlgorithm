@@ -74,9 +74,9 @@ void Enemy::Initialize()
 
 	//初期位置の設定
 	Vector3 pos;
-	pos.x = rand() % 50;
+	pos.x = rand() % 5;
 	pos.y= 2;
-	pos.z = rand() % 50;
+	pos.z = rand() % 5;
 
 	this->SetTrans(pos);
 
@@ -190,7 +190,7 @@ void Enemy::Draw()
 	}
 
 	//当たり判定の描画
-	m_CollisionNodeEnemy.Draw();
+	//m_CollisionNodeEnemy.Draw();
 }
 
 //ロボットの挙動

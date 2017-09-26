@@ -17,10 +17,7 @@ Game::Game() :
 	m_window(0),
 	m_outputWidth(800),
 	m_outputHeight(600),
-	m_featureLevel(D3D_FEATURE_LEVEL_9_1),
-	m_start_cnt(180),
-	m_second_cnt(0),
-	m_minute_cnt(0)
+	m_featureLevel(D3D_FEATURE_LEVEL_9_1)
 {
 }
 
@@ -67,6 +64,9 @@ void Game::Initialize(HWND window, int width, int height)
 	// プレイヤーの生成
 	m_Player = std::make_unique<Player>(m_keyboard.get());
 	m_Player->Initialize();
+
+	m_Enemy = std::make_unique<Enemy>();
+	m_Enemy->Initialize();
 
 	//カメラにキーボードをセット
 	m_Camera->SetKeyboard(m_keyboard.get());
@@ -146,6 +146,8 @@ void Game::Update(DX::StepTimer const& timer)
 	
 	//プレイヤーの更新処理
 	m_Player->Update();
+
+	m_Enemy->Update();
 
 	//キーボードの更新
 	Keyboard::State keystate = m_keyboard->GetState();
@@ -295,6 +297,8 @@ void Game::Render()
 
 	//プレイヤーの描画
 	m_Player->Draw();
+
+	m_Enemy->Draw();
 	
 	//ModelEffectManager::getInstance()->Draw();
 
@@ -379,20 +383,6 @@ void Game::GetDefaultSize(int& width, int& height) const
     // TODO: Change to desired default window size (note minimum size is 320x200).
     width = 800;
     height = 600;
-}
-
-void Game::Timer()
-{
-	if (m_start_cnt <= 0)
-	{
-		m_second_cnt++;
-
-		if (m_second_cnt / 60 >= 60)
-		{
-			m_second_cnt = 0;
-			m_minute_cnt++;
-		}
-	}
 }
 
 // These are the resources that depend on the device.

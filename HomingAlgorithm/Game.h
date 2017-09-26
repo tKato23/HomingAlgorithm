@@ -51,22 +51,7 @@ public:
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
 
-	//計測関数
-	void Timer();
-
 private:
-	// プレイヤー
-	std::unique_ptr<Player> m_Player;
-
-	//円オブジェクトの当たり判定
-	Sphere Circle_Sphere[Circle_Num];
-
-	//キーボード
-	std::unique_ptr<DirectX::Keyboard> m_keyboard;
-
-	////地形データのポインタ配列
-	//std::vector<LandShape*> m_landShapeArray;
-
     void Update(DX::StepTimer const& timer);
     void Render();
 
@@ -111,6 +96,18 @@ private:
 	//エフェクトファクトリ
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
 
+	//プレイヤー
+	std::unique_ptr<Player> m_Player;
+
+	//敵
+	std::unique_ptr<Enemy> m_Enemy;
+
+	//キーボード
+	std::unique_ptr<DirectX::Keyboard> m_keyboard;
+
+	////地形データのポインタ配列
+	//std::vector<LandShape*> m_landShapeArray;
+
 	//モデル(天球)
 	Obj3d m_objSkydome;
 
@@ -128,13 +125,4 @@ private:
 
 	////地形(空)
 	//LandShape m_landshape_sky;
-
-	//カウントダウン
-	int m_start_cnt;
-
-	//分
-	int m_minute_cnt;
-
-	//秒
-	int m_second_cnt;
 };
