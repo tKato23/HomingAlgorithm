@@ -135,25 +135,55 @@ void Player::Action()
 	//Wキーを押すと
 	if (keystate.W)
 	{
-		//現在の角度を取得
-		Quaternion rot = m_ObjPlayer[BODY].GetRotationQ();
-		Quaternion rotadd = Quaternion::CreateFromAxisAngle(Vector3::UnitX, ROT_SPEED);
-		rot = rotadd * rot;
+		//現在の座標・回転角を取得
+		Vector3 trans = m_ObjPlayer[BODY].GetTranslation();
 
-		//回転後の角度を反映
-		m_ObjPlayer[BODY].SetRotationQ(rot);
+		//移動ベクトル(Z座標の前進)
+		SimpleMath::Vector3 moveV(0.0f, 0.0f, -0.1f);
+
+		//移動ベクトルを回転する
+		moveV = Vector3::TransformNormal(moveV, m_ObjPlayer[BODY].GetWorld());
+
+		//移動
+		trans += moveV;
+
+		//移動した座標を反映
+		m_ObjPlayer[BODY].SetTranslation(trans);
+
+		////現在の角度を取得
+		//Quaternion rot = m_ObjPlayer[BODY].GetRotationQ();
+		//Quaternion rotadd = Quaternion::CreateFromAxisAngle(Vector3::UnitX, ROT_SPEED);
+		//rot = rotadd * rot;
+
+		////回転後の角度を反映
+		//m_ObjPlayer[BODY].SetRotationQ(rot);
 	}
 
 	//Sキーを押すと
 	if (keystate.S)
 	{
-		//現在の角度を取得
-		Quaternion rot = m_ObjPlayer[BODY].GetRotationQ();
-		Quaternion rotadd = Quaternion::CreateFromAxisAngle(Vector3::UnitX, -ROT_SPEED);
-		rot = rotadd * rot;
+		//現在の座標・回転角を取得
+		Vector3 trans = m_ObjPlayer[BODY].GetTranslation();
 
-		//回転後の角度を反映
-		m_ObjPlayer[BODY].SetRotationQ(rot);
+		//移動ベクトル(Z座標の前進)
+		SimpleMath::Vector3 moveV(0.0f, 0.0f, 0.1f);
+
+		//移動ベクトルを回転する
+		moveV = Vector3::TransformNormal(moveV, m_ObjPlayer[BODY].GetWorld());
+
+		//移動
+		trans += moveV;
+
+		//移動した座標を反映
+		m_ObjPlayer[BODY].SetTranslation(trans);
+
+		////現在の角度を取得
+		//Quaternion rot = m_ObjPlayer[BODY].GetRotationQ();
+		//Quaternion rotadd = Quaternion::CreateFromAxisAngle(Vector3::UnitX, -ROT_SPEED);
+		//rot = rotadd * rot;
+
+		////回転後の角度を反映
+		//m_ObjPlayer[BODY].SetRotationQ(rot);
 	}
 
 	//Aキーを押すと

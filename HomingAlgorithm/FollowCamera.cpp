@@ -43,25 +43,23 @@ void FollowCamera::Update()
 		// 目標座標の設定
 		SetTargetPos(m_player->GetTrans());
 		SetTargetAngle(m_player->GetRot().y);
+		m_targetWorld = m_player->GetWor();
 	}
 
 	//TPSカメラ
 	if (m_isFPS == false)
 	{
-		// 自機の上空2mを参照点とする
-		refpos = m_target_pos + Vector3(0, 2, 0);
+		Vector3 refvec = Vector3(0, 2, 0);
+
+		refvec = Vector3::TransformNormal(refvec, m_targetWorld);
+
+		refpos = m_target_pos + refvec;
 
 		// 参照点と視点の差分ベクトル
-		Vector3 cameraV(0, 0, CAMERA_DISTANCE);
-
-		// 自機の後ろに回り込むための回転行列を生成
-		Matrix rotmat = Matrix::CreateRotationY(m_target_angle);
-
-		//移動ベクトル(Z座標の前進)
-		SimpleMath::Vector3 moveV(0.0f, 0.0f, 3.0f);
+		Vector3 cameraV(0, 20, CAMERA_DISTANCE);
 
 		// 差分ベクトルを回転させる
-		cameraV = Vector3::TransformNormal(moveV, m_player[m_player->BODY].GetWor());
+		cameraV = Vector3::TransformNormal(cameraV, m_targetWorld);
 
 		// 視点座標を計算
 		eyepos = refpos + cameraV;

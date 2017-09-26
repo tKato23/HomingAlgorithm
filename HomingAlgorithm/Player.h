@@ -43,19 +43,19 @@ public:
 	//プレイヤーの挙動
 	void Action();
 
-	//プレイヤーの移動を取得する
+	//プレイヤーの角度を取得する
 	const DirectX::SimpleMath::Vector3& GetRot();
 
-	//プレイヤーの角度を取得する
+	//プレイヤーの位置を取得する
 	const DirectX::SimpleMath::Vector3& GetTrans();
 
 	//プレイヤーのワールド行列を取得する
 	const DirectX::SimpleMath::Matrix& GetWor();
 
-	//プレイヤーの移動をセットする
+	//プレイヤーの角度をセットする
 	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
 
-	//プレイヤーの角度をセットする
+	//プレイヤーの位置をセットする
 	void SetTrans(const DirectX::SimpleMath::Vector3& translation);
 
 	//プレイヤーの当たり判定(排斥処理用)を取得する
