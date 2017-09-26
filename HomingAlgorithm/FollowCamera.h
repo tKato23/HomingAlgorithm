@@ -12,6 +12,7 @@ protected:
 	
 	DirectX::SimpleMath::Vector3 m_target_pos;							//追従対象の座標
 	float m_target_angle;												//追従対象の回転角
+	DirectX::SimpleMath::Matrix m_targetWorld;
 	DirectX::Keyboard* m_keyboard;										//キーボード
 	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;			//キーボードトラッカー
 	bool m_isFPS;														//FPSカメラフラグ

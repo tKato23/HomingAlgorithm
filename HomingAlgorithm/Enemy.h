@@ -42,6 +42,9 @@ public:
 	//エネミーの当たり判定を取得する
 	const SphereNode& GetCollisionNodeEnemy() { return m_CollisionNodeEnemy; }
 
+	//	先読み型の自動追尾
+	void PrefetchHoming(DirectX::SimpleMath::Vector3 targetPos);
+
 private:
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjEnemy;

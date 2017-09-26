@@ -74,9 +74,9 @@ void Enemy::Initialize()
 
 	//初期位置の設定
 	Vector3 pos;
-	pos.x = rand() % 50;
+	pos.x = rand() % 5;
 	pos.y= 2;
-	pos.z = rand() % 50;
+	pos.z = rand() % 5;
 
 	this->SetTrans(pos);
 
@@ -190,7 +190,7 @@ void Enemy::Draw()
 	}
 
 	//当たり判定の描画
-	m_CollisionNodeEnemy.Draw();
+	//m_CollisionNodeEnemy.Draw();
 }
 
 //ロボットの挙動
@@ -282,3 +282,9 @@ void Enemy::SetTrans(const Vector3& translation)
 }
 
 //追尾ホーミング
+
+//	先読み型の自動追尾
+void Enemy::PrefetchHoming(Vector3 targetPos)
+{
+
+}
