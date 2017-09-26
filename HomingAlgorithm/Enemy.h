@@ -50,7 +50,7 @@ public:
 	void PrefetchHoming(DirectX::SimpleMath::Vector3 targetPos);
 
 	//旋回型の自動追尾
-	void PrefetchHoming(DirectX::SimpleMath::Vector3 targetPos);
+	void TurnHoming(DirectX::SimpleMath::Vector3 targetPos);
 
 private:
 	//自機の3Dオブジェクト

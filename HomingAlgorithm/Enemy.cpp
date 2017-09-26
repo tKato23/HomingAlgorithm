@@ -294,3 +294,13 @@ void Enemy::PrefetchHoming(Vector3 targetPos)
 {
 
 }
+
+//旋回型の自動追尾
+void Enemy::TurnHoming(Vector3 targetPos)
+{
+	//追尾対象(プレイヤー)へのベクトル
+	Vector3 TurnVec = this->GetTrans() - m_Player->GetTrans();
+
+	//ベクトルの正規化
+	TurnVec.Normalize();
+}
