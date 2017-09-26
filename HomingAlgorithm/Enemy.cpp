@@ -280,3 +280,9 @@ void Enemy::SetTrans(const Vector3& translation)
 {
 	m_ObjEnemy[BODY].SetTranslation(translation);
 }
+
+//	æ“Ç‚İŒ^‚Ì©“®’Ç”ö
+void Enemy::PrefetchHoming(Vector3 targetPos)
+{
+
+}
