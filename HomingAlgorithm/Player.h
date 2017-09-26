@@ -52,6 +52,9 @@ public:
 	//プレイヤーのワールド行列を取得する
 	const DirectX::SimpleMath::Matrix& GetWor();
 
+	//プレイヤーの移動ベクトルを取得する
+	const DirectX::SimpleMath::Matrix& GetMoveV();
+
 	//プレイヤーの角度をセットする
 	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
 
@@ -86,6 +89,9 @@ private:
 
 	//速度
 	DirectX::SimpleMath::Vector3 m_Velocity;
+
+	//移動ベクトル
+	DirectX::SimpleMath::Vector3 m_moveV;
 
 	//前進速度
 	float m_speed;

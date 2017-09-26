@@ -100,17 +100,17 @@ void Enemy::Update()
 
 	if (m_Timer < 0)
 	{
-		//カウントが0に達したらタイマーを60に戻す
-		m_Timer = 60;
+		////カウントが0に達したらタイマーを60に戻す
+		//m_Timer = 60;
 
-		//目標角度を変更
-		float rnd = (float)rand() / RAND_MAX - 0.5f;
-		rnd *= 180.0f;
+		////目標角度を変更
+		//float rnd = (float)rand() / RAND_MAX - 0.5f;
+		//rnd *= 180.0f;
 
-		rnd = XMConvertToRadians(rnd);
+		//rnd = XMConvertToRadians(rnd);
 
-		//メンバ変数で目標角度を保持
-		m_DistAngle += rnd;
+		////メンバ変数で目標角度を保持
+		//m_DistAngle += rnd;
 	}
 
 	//Vector3 angle = m_ObjEnemy[BODY].GetRotation();
@@ -118,31 +118,31 @@ void Enemy::Update()
 
 	//目標角度に向かって、機体の角度を補間する
 	{
-		//敵の角度を回転させる
-		Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
+		////敵の角度を回転させる
+		//Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
 
-		////目標角度への、最短角度を取得
-		//float angle = GetShortAngleRad(rotv.y, XMConvertToRadians(m_DistAngle));
-		
-		
-		float angle = m_DistAngle - rotv.y;
+		//////目標角度への、最短角度を取得
+		////float angle = GetShortAngleRad(rotv.y, XMConvertToRadians(m_DistAngle));
+		//
+		//
+		//float angle = m_DistAngle - rotv.y;
 
-		//180度を超える場合、逆回りにする
-		if (angle > XM_PI)
-		{
-			angle -= XM_2PI;
-		}
+		////180度を超える場合、逆回りにする
+		//if (angle > XM_PI)
+		//{
+		//	angle -= XM_2PI;
+		//}
 
-		if (angle < -XM_PI)
-		{
-			angle += XM_2PI;
-		}
+		//if (angle < -XM_PI)
+		//{
+		//	angle += XM_2PI;
+		//}
 
 
-		//補間
-		rotv.y += angle * 0.01f;
+		////補間
+		//rotv.y += angle * 0.01f;
 
-		SetRot(rotv);
+		//SetRot(rotv);
 
 		//m_ObjEnemy[BODY].SetRotation(rotv);
 	}
@@ -245,37 +245,43 @@ void Enemy::Action()
 	}
 
 	//移動ベクトル（Z座標）
-	Vector3 moveV(0, 0, -0.02f);
+	m_moveV = Vector3(0, 0, -0.02f);
 
 	float angle = m_ObjEnemy[BODY].GetRotation().y;
 
 	//移動量ベクトルを自機の角度分回転させる
-	moveV = Vector3::TransformNormal(moveV, m_ObjEnemy[BODY].GetWorld());
+	m_moveV = Vector3::TransformNormal(m_moveV, m_ObjEnemy[BODY].GetWorld());
 
 	////座標を移動させる
 	Vector3 pos = m_ObjEnemy[BODY].GetTranslation();
-	m_ObjEnemy[BODY].SetTranslation(pos + moveV);
+	m_ObjEnemy[BODY].SetTranslation(pos + m_moveV);
 }
 
-//プレイヤーの移動を取得する
+//エネミーの移動を取得する
 const DirectX::SimpleMath::Vector3& Enemy::GetRot()
 {
 	return m_ObjEnemy[BODY].GetRotation();
 }
 
-//プレイヤーの角度を取得する
+//エネミーの角度を取得する
 const DirectX::SimpleMath::Vector3& Enemy::GetTrans()
 {
 	return m_ObjEnemy[BODY].GetTranslation();
 }
 
-//プレイヤーの移動をセットする
+//エネミーの移動ベクトルを取得する
+const DirectX::SimpleMath::Vector3 & Enemy::GetMoveV()
+{
+	return m_moveV;
+}
+
+//エネミーの移動をセットする
 void Enemy::SetRot(const Vector3& rotation)
 {
 	m_ObjEnemy[BODY].SetRotation(rotation);
 }
 
-//プレイヤーの角度をセットする
+//エネミーの角度をセットする
 void Enemy::SetTrans(const Vector3& translation)
 {
 	m_ObjEnemy[BODY].SetTranslation(translation);
@@ -287,4 +293,14 @@ void Enemy::SetTrans(const Vector3& translation)
 void Enemy::PrefetchHoming(Vector3 targetPos)
 {
 
+}
+
+//旋回型の自動追尾
+void Enemy::TurnHoming(Vector3 targetPos)
+{
+	//追尾対象(プレイヤー)へのベクトル
+	Vector3 TurnVec = this->GetTrans() - m_Player->GetTrans();
+
+	//ベクトルの正規化
+	TurnVec.Normalize();
 }
