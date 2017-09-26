@@ -5,15 +5,35 @@
 #pragma once
 
 #include "StepTimer.h"
+#include <VertexTypes.h>
+#include <PrimitiveBatch.h>
+#include <Effects.h>
+#include <CommonStates.h>
+#include <SimpleMath.h>
+#include <Model.h>
+#include "FollowCamera.h"
+#include "DebugText.h"
 
+#include <SimpleMath.h>
+#include <vector>
+#include "Obj3d.h"
+#include "Player.h"
+#include "Enemy.h"
+
+//定数宣言
+const int Ball_Number = 20;
+const int Teapot_Number = 20;
+const int Max_Graund = 200;
+const int Enemy_Num = 5;
+const int Circle_Num = 15;
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
 class Game
 {
 public:
-
-    Game();
+	Game();
+	~Game();
 
     // Initialization and management
     void Initialize(HWND window, int width, int height);
@@ -31,7 +51,21 @@ public:
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
 
+	//計測関数
+	void Timer();
+
 private:
+	// プレイヤー
+	std::unique_ptr<Player> m_Player;
+
+	//円オブジェクトの当たり判定
+	Sphere Circle_Sphere[Circle_Num];
+
+	//キーボード
+	std::unique_ptr<DirectX::Keyboard> m_keyboard;
+
+	////地形データのポインタ配列
+	//std::vector<LandShape*> m_landShapeArray;
 
     void Update(DX::StepTimer const& timer);
     void Render();
@@ -62,4 +96,45 @@ private:
 
     // Rendering loop timer.
     DX::StepTimer                                   m_timer;
+
+	std::unique_ptr<DirectX::BasicEffect> m_effect;
+	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionNormal>> m_batch;
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
+
+	DirectX::SimpleMath::Matrix m_view;
+	DirectX::SimpleMath::Matrix m_proj;	
+
+	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+
+	std::unique_ptr<DebugText> m_debugText;
+
+	//エフェクトファクトリ
+	std::unique_ptr<DirectX::EffectFactory> m_factory;
+
+	//モデル(天球)
+	Obj3d m_objSkydome;
+
+	//モデル(地面)
+	Obj3d m_objGround;
+
+	//地面のワールド行列
+	DirectX::SimpleMath::Matrix m_worldGraund;
+
+	//カメラ
+	std::unique_ptr<FollowCamera> m_Camera;
+
+	////地形(地面)
+	//LandShape m_landshape_ground;
+
+	////地形(空)
+	//LandShape m_landshape_sky;
+
+	//カウントダウン
+	int m_start_cnt;
+
+	//分
+	int m_minute_cnt;
+
+	//秒
+	int m_second_cnt;
 };

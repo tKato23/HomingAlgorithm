@@ -5,37 +5,124 @@
 #include "pch.h"
 #include "Game.h"
 
+
 extern void ExitGame();
 
 using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
 Game::Game() :
-    m_window(0),
-    m_outputWidth(800),
-    m_outputHeight(600),
-    m_featureLevel(D3D_FEATURE_LEVEL_9_1)
+	m_window(0),
+	m_outputWidth(800),
+	m_outputHeight(600),
+	m_featureLevel(D3D_FEATURE_LEVEL_9_1),
+	m_start_cnt(180),
+	m_second_cnt(0),
+	m_minute_cnt(0)
+{
+}
+
+Game::~Game()
 {
 }
 
 // Initialize the Direct3D resources required to run.
 void Game::Initialize(HWND window, int width, int height)
 {
-    m_window = window;
-    m_outputWidth = std::max(width, 1);
-    m_outputHeight = std::max(height, 1);
+	m_window = window;
+	m_outputWidth = std::max(width, 1);
+	m_outputHeight = std::max(height, 1);
 
-    CreateDevice();
+	CreateDevice();
 
-    CreateResources();
+	CreateResources();
 
-    // TODO: Change the timer settings if you want something other than the default variable timestep mode.
-    // e.g. for 60 FPS fixed timestep update logic, call:
-    /*
-    m_timer.SetFixedTimeStep(true);
-    m_timer.SetTargetElapsedSeconds(1.0 / 60);
-    */
+	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
+	// e.g. for 60 FPS fixed timestep update logic, call:
+	/*
+	m_timer.SetFixedTimeStep(true);
+	m_timer.SetTargetElapsedSeconds(1.0 / 60);
+	*/
+
+	//初期化はここに書く
+
+	//カメラの生成
+	m_Camera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
+
+	//3Dオブジェクトの静的メンバを初期化
+	Obj3d::InitializeStatic(m_d3dDevice, m_d3dContext, m_Camera.get());
+
+	////地形クラスの初期化
+	//LandShapeCommonDef lscdef;
+	//lscdef.pDevice = m_d3dDevice.Get();
+	//lscdef.pDeviceContext = m_d3dContext.Get();
+	//lscdef.pCamera = m_Camera.get();
+	//LandShape::InitializeCommon(lscdef);
+
+	// キーボードの初期化
+	m_keyboard = std::make_unique<Keyboard>();
+
+	// プレイヤーの生成
+	m_Player = std::make_unique<Player>(m_keyboard.get());
+	m_Player->Initialize();
+
+	//カメラにキーボードをセット
+	m_Camera->SetKeyboard(m_keyboard.get());
+
+	// カメラにプレイヤーをセット
+	m_Camera->SetPlayer(m_Player.get());
+
+	m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
+
+	m_effect = std::make_unique<BasicEffect>(m_d3dDevice.Get());
+
+	m_view = Matrix::CreateLookAt(Vector3(0, 2.f, 5.f),
+		Vector3(1, 0, 0), Vector3(0, 1, 0));
+
+	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
+		float(m_outputWidth) / float(m_outputHeight), 0.1f, 500.f);
+
+	m_effect->SetView(m_view);
+
+	m_effect->SetProjection(m_proj);
+
+	m_effect->SetVertexColorEnabled(true);
+
+	void const* shaderByteCode;
+	size_t byteCodeLength;
+
+	m_effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+
+	m_d3dDevice->CreateInputLayout(VertexPositionColor::InputElements,
+		VertexPositionColor::InputElementCount,
+		shaderByteCode, byteCodeLength,
+		m_inputLayout.GetAddressOf());
+
+	//エフェクトファクトリの生成
+	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
+
+	//テクスチャの読み込みパスの指定
+	m_factory->SetDirectory(L"Resources");
+
+	//天球モデルの読み込み
+	m_objSkydome.LoadModel(L"Resources/Skydome.cmo");
+
+	//地面モデルの読み込み
+	m_objGround.LoadModel(L"Resources/Graund200m.cmo");
+
+	////地形データの読み込み(地面) landshapeファイル名、cmoファイル名
+	//m_landshape_ground.Initialize(L"Graund200m", L"Graund200m");
+
+	////地形データの読み込み(空) landshapeファイル名、cmoファイル名
+	//m_landshape_sky.Initialize(L"Skydome", L"Skydome");
+
+	// スプライトバッチを作成
+	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
+
+	// デバッグテキストを作成
+	m_debugText = std::make_unique<DebugText>(m_d3dDevice.Get(), m_spriteBatch.get());
 }
 
 // Executes the basic game loop.
@@ -52,15 +139,138 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const& timer)
 {
-    float elapsedTime = float(timer.GetElapsedSeconds());
+	float elapsedTime = float(timer.GetElapsedSeconds());
 
-    // TODO: Add your game logic here.
-    elapsedTime;
+	// TODO: Add your game logic here.
+	elapsedTime;
+	
+	//プレイヤーの更新処理
+	m_Player->Update();
+
+	//キーボードの更新
+	Keyboard::State keystate = m_keyboard->GetState();
+
+	// キーボードの更新
+	//Keyboard::State g_key = keyboard->GetState();
+
+	{//自機に追従するカメラ
+		//カメラの更新
+		m_Camera->Update();
+		m_view = m_Camera->GetView();
+		m_proj = m_Camera->GetProj();
+	}
+
+	m_objSkydome.Update();
+	m_objGround.Update();
+
+	//地形の更新処理
+	//m_landshape_ground.Update();
+	//m_landshape_sky.Update();
+
+	{//自機の地形へのめり込みを排斥する
+		//自機の当たり判定球を取得
+		Sphere sphere = m_Player->GetCollisionNodeBody();
+
+		//自機のワールド座標を取得
+		Vector3 trans = m_Player->GetTrans();
+
+		//球の中心から自機センターのベクトル
+		Vector3 sphere2player = trans - sphere.Center;
+
+		//めり込み排斥ベクトル
+		Vector3 reject;
+
+		////地形と球の当たり判定
+		//if (m_landshape_ground.IntersectSphere(sphere, &reject))
+		//{
+		//	//めり込みを解消するように移動
+		//	sphere.Center += reject;
+		//}
+
+		////地形と球の当たり判定
+		//if (m_landshape_sky.IntersectSphere(sphere, &reject))
+		//{
+		//	//めり込みを解消するように移動
+		//	sphere.Center += reject;
+		//}
+
+		////地形と球の当たり判定
+		//for (int i = 0; i < Circle_Num; i++)
+		//{
+		//	if (m_landshape_circle[i].IntersectSphere(sphere, &reject))
+		//	{
+		//		//めり込みを解消するように移動
+		//		sphere.Center += reject;
+		//	}
+		//}
+
+		//自機を移動
+		m_Player->SetTrans(sphere.Center + sphere2player);
+
+		m_Player->Calc();
+	}
+
+	{//自機が地面に立つ処理
+		if (m_Player->GetVelocity().y <= 0.0f)
+		{
+			//自機の頭から足元への線分
+			Segment player_segment;
+
+			//自機のワールド座標を取得
+			Vector3 trans = m_Player->GetTrans();
+			player_segment.start = trans + Vector3(0, 1, 0);
+			player_segment.end = trans + Vector3(0, -0.5f, 0);
+
+			//交点座標
+			Vector3 inter;
+
+			////地形の線分の当たり判定（レイキャスティング）
+			//for (int i = 0; i < Circle_Num; i++)
+			//{
+			//	if (m_landshape_circle[i].IntersectSegment(player_segment, &inter))
+			//	{
+			//		//Y座標のみ交点の位置に移動
+			//		trans.y = inter.y;
+			//	}
+			//}
+
+			////地形の線分の当たり判定（レイキャスティング）
+			//for (int i = 0; i < Circle_Num; i++)
+			//{
+			//	if (m_landshape_sky.IntersectSegment(player_segment, &inter))
+			//	{
+			//		//Y座標のみ交点の位置に移動
+			//		trans.y = inter.y;
+			//	}
+			//}
+
+			//自機の移動
+			m_Player->SetTrans(trans);
+			m_Player->Calc();
+		}
+	}
+
+	//ModelEffectManager::getInstance()->Update();
 }
 
 // Draws the scene.
 void Game::Render()
 {
+	//頂点インデックス
+	uint16_t indices[] =
+	{
+		0, 1, 2,
+		2, 1, 3,
+	};
+
+	VertexPositionNormal vertices[] =
+	{
+		{Vector3(-1.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f) },
+		{Vector3(-1.0f, -1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f) },
+		{Vector3(1.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f) },
+		{Vector3(1.0f, -1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f) },
+	};
+
     // Don't try to render anything before the first Update.
     if (m_timer.GetFrameCount() == 0)
     {
@@ -70,6 +280,29 @@ void Game::Render()
     Clear();
 
     // TODO: Add your rendering code here.
+
+	//描画処理
+	DirectX::CommonStates m_states(m_d3dDevice.Get());
+
+	m_d3dContext->OMSetBlendState(m_states.Opaque(), nullptr, 0xFFFFFFFF);
+	m_d3dContext->OMSetDepthStencilState(m_states.DepthNone(), 0);
+	m_d3dContext->RSSetState(m_states.CullNone());
+	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
+
+	//モデル（天球）の描画
+	m_objSkydome.Draw();
+	m_objGround.Draw();
+
+	//プレイヤーの描画
+	m_Player->Draw();
+	
+	//ModelEffectManager::getInstance()->Draw();
+
+	m_spriteBatch->Begin();
+
+	m_debugText->Draw();
+
+	m_spriteBatch->End();
 
     Present();
 }
@@ -146,6 +379,20 @@ void Game::GetDefaultSize(int& width, int& height) const
     // TODO: Change to desired default window size (note minimum size is 320x200).
     width = 800;
     height = 600;
+}
+
+void Game::Timer()
+{
+	if (m_start_cnt <= 0)
+	{
+		m_second_cnt++;
+
+		if (m_second_cnt / 60 >= 60)
+		{
+			m_second_cnt = 0;
+			m_minute_cnt++;
+		}
+	}
 }
 
 // These are the resources that depend on the device.
@@ -355,6 +602,8 @@ void Game::OnDeviceLost()
 {
     // TODO: Add Direct3D resource cleanup here.
 
+	m_debugText.reset();
+	m_spriteBatch.reset();
     m_depthStencilView.Reset();
     m_renderTargetView.Reset();
     m_swapChain1.Reset();
