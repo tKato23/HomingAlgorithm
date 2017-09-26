@@ -287,4 +287,10 @@ void Enemy::SetTrans(const Vector3& translation)
 void Enemy::PrefetchHoming(Vector3 targetPos)
 {
 
+	////	敵とプレイヤー座標の差
+	//Vector3 differencePos　m_player->GetTrans() - GetTrans();
+
+	////	移動ベクトルの差
+	//Vector3 differenceVec;
+
 }
