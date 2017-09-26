@@ -280,3 +280,5 @@ void Enemy::SetTrans(const Vector3& translation)
 {
 	m_ObjEnemy[BODY].SetTranslation(translation);
 }
+
+//追尾ホーミング
