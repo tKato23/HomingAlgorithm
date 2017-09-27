@@ -1,0 +1,25 @@
+diff a/HomingAlgorithm/Player.h b/HomingAlgorithm/Player.h	(rejected hunks)
+@@ -43,19 +43,19 @@
+ 	//�v���C���[�̋���
+ 	void Action();
+ 
+-	//�v���C���[�̈ړ���擾����
++	//�v���C���[�̊p�x��擾����
+ 	const DirectX::SimpleMath::Vector3& GetRot();
+ 
+-	//�v���C���[�̊p�x��擾����
++	//�v���C���[�̈ʒu��擾����
+ 	const DirectX::SimpleMath::Vector3& GetTrans();
+ 
+ 	//�v���C���[�̃��[���h�s���擾����
+ 	const DirectX::SimpleMath::Matrix& GetWor();
+ 
+-	//�v���C���[�̈ړ���Z�b�g����
++	//�v���C���[�̊p�x��Z�b�g����
+ 	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
+ 
+-	//�v���C���[�̊p�x��Z�b�g����
++	//�v���C���[�̈ʒu��Z�b�g����
+ 	void SetTrans(const DirectX::SimpleMath::Vector3& translation);
+ 
+ 	//�v���C���[�̓����蔻��(�r�ˏ����p)��擾����
