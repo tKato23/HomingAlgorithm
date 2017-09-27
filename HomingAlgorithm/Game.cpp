@@ -67,6 +67,7 @@ void Game::Initialize(HWND window, int width, int height)
 
 	m_Enemy = std::make_unique<Enemy>();
 	m_Enemy->Initialize();
+	m_Enemy->SetTrans(Vector3(10.0f, 0.0f, 10.0f));
 	m_Enemy->SetPlayer(m_Player.get());
 
 	//カメラにキーボードをセット

@@ -52,6 +52,8 @@ public:
 	//旋回型の自動追尾
 	void TurnHoming(DirectX::SimpleMath::Vector3 targetPos);
 
+	void UpdateBresenham(DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 targetPos);
+
 	void SetPlayer(Player* player) { m_Player = player; }				//プレイヤーをセット
 
 private:
@@ -60,6 +62,13 @@ private:
 
 	//	プレイヤー
 	Player* m_Player;
+
+	//	前フレームのターゲット座標
+	static const int STEP_MAX = 100;
+	DirectX::SimpleMath::Vector3 m_nextPos[STEP_MAX];
+	DirectX::SimpleMath::Vector3 m_oldTargetPos;
+	std::vector<DirectX::SimpleMath::Vector3> m_movePos;
+	int m_stepCnt;
 
 	// サイン用の引数となる角度
 	float m_sinAngle;
