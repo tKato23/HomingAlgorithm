@@ -133,7 +133,7 @@ void Player::Action()
 	m_ObjPlayer[BODY].SetTranslation(trans);
 
 	//Wキーを押すと
-	if (keystate.W)
+	if (keystate.W || keystate.Up)
 	{
 		//現在の座標・回転角を取得
 		Vector3 trans = m_ObjPlayer[BODY].GetTranslation();
@@ -160,7 +160,7 @@ void Player::Action()
 	}
 
 	//Sキーを押すと
-	if (keystate.S)
+	if (keystate.S || keystate.Down)
 	{
 		//現在の座標・回転角を取得
 		Vector3 trans = m_ObjPlayer[BODY].GetTranslation();
@@ -187,7 +187,7 @@ void Player::Action()
 	}
 
 	//Aキーを押すと
-	if (keystate.A)
+	if (keystate.A || keystate.Left)
 	{
 		//現在の角度を取得
 		Quaternion rot = m_ObjPlayer[BODY].GetRotationQ();
@@ -199,7 +199,7 @@ void Player::Action()
 	}
 
 	//Dキーを押すと
-	if (keystate.D)
+	if (keystate.D || keystate.Right)
 	{
 		//現在の角度を取得
 		Quaternion rot = m_ObjPlayer[BODY].GetRotationQ();

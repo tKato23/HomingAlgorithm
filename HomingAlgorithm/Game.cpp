@@ -66,6 +66,7 @@ void Game::Initialize(HWND window, int width, int height)
 	m_Player->Initialize();
 	m_Player->SetTrans(Vector3(0.0f, 10.0f, 0.0f));
 
+	//	エネミーの生成
 	m_Enemy = std::make_unique<Enemy>();
 	m_Enemy->Initialize();
 	m_Enemy->SetTrans(Vector3(-20.0f, 0.0f, -20.0f));
@@ -258,7 +259,8 @@ void Game::Update(DX::StepTimer const& timer)
 
 	//ModelEffectManager::getInstance()->Update();
 
-	m_debugText->AddText(Vector2(0, 10), L"%f", m_Player->GetMoveV().z);
+	//	デバッグ表示
+	m_debugText->AddText(Vector2(0, 10), L"%f", m_Enemy->GetTrans().x);
 
 }
 
