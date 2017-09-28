@@ -43,20 +43,32 @@ public:
 	//エネミーの位置をセットする
 	void SetTrans(const DirectX::SimpleMath::Vector3& translation);
 
+	void SetPlayer(Player* player) { m_Player = player; }
+
 	//エネミーの当たり判定を取得する
 	const SphereNode& GetCollisionNodeEnemy() { return m_CollisionNodeEnemy; }
 
 	//先読み型の自動追尾
-	void PrefetchHoming(DirectX::SimpleMath::Vector3 targetPos);
+	void PrefetchHoming();
 
 	//旋回型の自動追尾
-	void TurnHoming(DirectX::SimpleMath::Vector3 targetPos);
+	void TurnHoming();
+
+	void UpdateBresenham(DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 targetPos);
 
 private:
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjEnemy;
 
+	//	プレイヤー
 	Player* m_Player;
+
+	//	前フレームのターゲット座標
+	static const int STEP_MAX = 100;
+	DirectX::SimpleMath::Vector3 m_nextPos[STEP_MAX];
+	DirectX::SimpleMath::Vector3 m_oldTargetPos;
+	std::vector<DirectX::SimpleMath::Vector3> m_movePos;
+	int m_stepCnt;
 
 	// サイン用の引数となる角度
 	float m_sinAngle;

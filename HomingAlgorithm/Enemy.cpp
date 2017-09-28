@@ -7,8 +7,12 @@ using namespace DirectX::SimpleMath;
 Enemy::Enemy()
 {
 	m_sinAngle = 0.0f;
+	m_Player = nullptr;
 
 	Initialize();
+
+	//	初期化処理
+	m_Player = nullptr;
 }
 
 //デストラクタ
@@ -72,14 +76,6 @@ void Enemy::Initialize()
 	//目標角度の初期化
 	m_DistAngle = 0.0f;
 
-	//初期位置の設定
-	Vector3 pos;
-	pos.x = rand() % 5;
-	pos.y= 2;
-	pos.z = rand() % 5;
-
-	this->SetTrans(pos);
-
 	{//弾丸用の当たり判定を設定する
 		m_CollisionNodeEnemy.Initialize();
 
@@ -87,6 +83,8 @@ void Enemy::Initialize()
 		m_CollisionNodeEnemy.SetTrans(Vector3(0, 0, 0));
 		m_CollisionNodeEnemy.SetLocalRadius(Vector3(0.8f, 0.8f, 0.8f));
 	}
+
+	//m_oldTargetPos = Vector3::Zero;
 }
 
 //更新処理
@@ -96,10 +94,10 @@ void Enemy::Update()
 	this->Action();
 
 	//定期的に進行方向を変える
-	m_Timer--;	//メンバ変数でタイマーを作り、カウントダウン
+	m_Timer++;	//メンバ変数でタイマーを作り、カウントダウン
 
-	if (m_Timer < 0)
-	{
+	//if (m_Timer < 0)
+	//{
 		////カウントが0に達したらタイマーを60に戻す
 		//m_Timer = 60;
 
@@ -111,7 +109,7 @@ void Enemy::Update()
 
 		////メンバ変数で目標角度を保持
 		//m_DistAngle += rnd;
-	}
+	//}
 
 	//Vector3 angle = m_ObjEnemy[BODY].GetRotation();
 	/*SetRot(Vector3(0, m_DistAngle, 0));*/
@@ -149,19 +147,18 @@ void Enemy::Update()
 
 	//機体の向いている方向に進む
 	{
-		//今の座標を取得
-		Vector3 trans = m_ObjEnemy[BODY].GetTranslation();
+		////今の座標を取得
+		//Vector3 trans = m_ObjEnemy[BODY].GetTranslation();
 
-		Vector3 move(0, 0, -0.02f);
-		Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
-		Matrix rotm = Matrix::CreateRotationY(rotv.y);
-		move = Vector3::TransformNormal(move, rotm);
+		//Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
+		//Matrix rotm = Matrix::CreateRotationY(rotv.y);
+		//m_moveV = Vector3::TransformNormal(m_moveV, rotm);
 
-		//座標を移動
-		trans += move;
+		////座標を移動
+		//trans += m_moveV;
 
-		//移動後の座標をセット
-		m_ObjEnemy[BODY].SetTranslation(trans);
+		////移動後の座標をセット
+		//m_ObjEnemy[BODY].SetTranslation(trans);
 	}
 
 	//各パーツの更新
@@ -169,6 +166,11 @@ void Enemy::Update()
 
 	//当たり判定の更新
 	m_CollisionNodeEnemy.Update();
+
+	//	プレイヤーへの追尾
+	//PrefetchHoming();
+
+	TurnHoming();
 }
 
 //行列更新
@@ -245,25 +247,21 @@ void Enemy::Action()
 	}
 
 	//移動ベクトル（Z座標）
-	m_moveV = Vector3(0, 0, -0.02f);
+	m_moveV = Vector3(0.0f, 0.0f, 0.0f);
 
 	float angle = m_ObjEnemy[BODY].GetRotation().y;
 
 	//移動量ベクトルを自機の角度分回転させる
 	m_moveV = Vector3::TransformNormal(m_moveV, m_ObjEnemy[BODY].GetWorld());
-
-	////座標を移動させる
-	Vector3 pos = m_ObjEnemy[BODY].GetTranslation();
-	m_ObjEnemy[BODY].SetTranslation(pos + m_moveV);
 }
 
-//エネミーの移動を取得する
+//エネミーの角度を取得する
 const DirectX::SimpleMath::Vector3& Enemy::GetRot()
 {
 	return m_ObjEnemy[BODY].GetRotation();
 }
 
-//エネミーの角度を取得する
+//エネミーの位置を取得する
 const DirectX::SimpleMath::Vector3& Enemy::GetTrans()
 {
 	return m_ObjEnemy[BODY].GetTranslation();
@@ -275,13 +273,13 @@ const DirectX::SimpleMath::Vector3 & Enemy::GetMoveV()
 	return m_moveV;
 }
 
-//エネミーの移動をセットする
+//エネミーの角度をセットする
 void Enemy::SetRot(const Vector3& rotation)
 {
 	m_ObjEnemy[BODY].SetRotation(rotation);
 }
 
-//エネミーの角度をセットする
+//エネミーの位置をセットする
 void Enemy::SetTrans(const Vector3& translation)
 {
 	m_ObjEnemy[BODY].SetTranslation(translation);
@@ -290,17 +288,149 @@ void Enemy::SetTrans(const Vector3& translation)
 //追尾ホーミング
 
 //	先読み型の自動追尾
-void Enemy::PrefetchHoming(Vector3 targetPos)
+void Enemy::PrefetchHoming()
 {
 
+	////	敵とプレイヤー座標の差
+	//Vector3 differencePos = m_Player->GetTrans() - GetTrans();
+
+	////	移動ベクトルの差
+	//Vector3 differenceVec = m_Player->GetMoveV() - GetMoveV();
+
+	//	相対距離
+	Vector3 dis;
+	dis.x = m_Player->GetTrans().x - GetTrans().x;
+	dis.y = m_Player->GetTrans().y - GetTrans().y;
+	dis.z = m_Player->GetTrans().z - GetTrans().z;
+
+	//	相対速度
+	Vector3 vel;
+	vel.x = m_Player->GetMoveV().x - GetMoveV().x;
+	vel.y = m_Player->GetMoveV().y - GetMoveV().y;
+	vel.z = m_Player->GetMoveV().z - GetMoveV().z;
+
+
+	//	接近時間　
+	//Vector3 time = differencePos / differenceVec;
+	float time = 0.0f;
+	float distance = sqrtf(dis.x * dis.x + dis.y * dis.y + dis.z * dis.z);
+	float velocity = sqrtf(vel.x * vel.x + vel.y * vel.y + vel.z * vel.z);
+
+	time = distance / velocity;
+	time = fabsf(time);
+
+	//	予測地点
+	Vector3 pos;
+	pos.x = m_Player->GetTrans().x + (m_Player->GetMoveV().x * time);
+	pos.y = m_Player->GetTrans().y + (m_Player->GetMoveV().y * time);
+	pos.z = m_Player->GetTrans().z + (m_Player->GetMoveV().z * time);
+
+	//	ベクトル
+	pos = pos - GetTrans();
+
+
+	//pos.Normalize();
+	pos = pos * this->GetMoveV();
+
+	////	目標地点
+	//Vector3 targetPoint =  m_Player->GetTrans() + (m_Player->GetMoveV() * time);
+
+	////	予測点の方向
+	//Vector3 dir = targetPoint - GetTrans();
+	//dir.Normalize();
+
+	////	敵の移動先
+	//Vector3 move = dir * GetMoveV();
+
+
+	//	敵に反映させる
+	this->SetTrans(GetTrans() - pos);
 }
 
+//void Enemy::UpdateBresenham(DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 targetPos)
+//{
+//	if (m_stepCnt >= STEP_MAX)
+//	{
+//		return;
+//	}
+//	Vector3 nowPos = pos;
+//
+//	int deltaX = targetPos.x - nowPos.x;
+//	int deltaY = targetPos.y - nowPos.y;
+//
+//	const int stepX = (deltaX >= 0) ? 1 : -1;
+//	const int stepY = (deltaY >= 0) ? 1 : -1;
+//
+//	deltaX = abs(deltaX);
+//	deltaY = abs(deltaY);
+//
+//	if (deltaY > deltaX)
+//	{
+//		int f = (deltaX << 1) - deltaY;
+//		for (int i = 0; i < deltaY; i++)
+//		{
+//			if (f >= 0)
+//			{
+//				nowPos.x += stepX;
+//				f -= (deltaY << 1);
+//			}
+//			nowPos.y += stepY;
+//			f += (deltaX << 1);
+//
+//			m_nextPos[i] = nowPos;
+//		}
+//	}
+//	else
+//	{
+//		int f = (deltaX << 1) - deltaY;
+//		for (int i = 0; i < deltaY; i++)
+//		{
+//			if (f >= 0)
+//			{
+//				nowPos.x += stepX;
+//				f -= (deltaY << 1);
+//			}
+//			nowPos.y += stepY;
+//			f += (deltaX << 1);
+//
+//			m_nextPos[i] = nowPos;
+//		}
+//	}
+//}
+//}
+
 //旋回型の自動追尾
-void Enemy::TurnHoming(Vector3 targetPos)
+void Enemy::TurnHoming()
 {
+	//移動ベクトル(速度)
+	m_moveV = Vector3(0.07f, 0.07f, 0.07f);
+
 	//追尾対象(プレイヤー)へのベクトル
-	Vector3 TurnVec = this->GetTrans() - m_Player->GetTrans();
+	Vector3 TurnVec = m_Player->GetTrans() - this->GetTrans();
 
 	//ベクトルの正規化
 	TurnVec.Normalize();
+
+	//追尾対象へのベクトルに移動ベクトルを乗算する
+	TurnVec = TurnVec * m_moveV;
+
+	//座標を移動させる
+	Vector3 pos = this->GetTrans();
+	this->SetTrans(pos + TurnVec);
+
+	this->SetRot(m_Player->GetRot());
+
+	//プレイヤーがエネミーに向かって左から接近
+	//if (TurnVec.x > -5.0f)
+	//{
+		//this->SetTrans(Vector3(m_Player->GetTrans().x + 5.0f, this->GetTrans().y, this->GetTrans().z));
+	//}
+	//if (TurnVec.x < 5.0f && !(TurnVec.x > -5.0f) )
+	//{
+	//	this->SetTrans(Vector3(m_Player->GetTrans().x + 5.0f, this->GetTrans().y, this->GetTrans().z));
+	//}
+
+	//Vector3 speed = TurnVec * this->GetMoveV();
+
+	//this->SetTrans(a);
 }

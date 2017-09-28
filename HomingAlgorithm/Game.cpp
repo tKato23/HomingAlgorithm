@@ -64,9 +64,12 @@ void Game::Initialize(HWND window, int width, int height)
 	// プレイヤーの生成
 	m_Player = std::make_unique<Player>(m_keyboard.get());
 	m_Player->Initialize();
+	m_Player->SetTrans(Vector3(0.0f, 10.0f, 0.0f));
 
 	m_Enemy = std::make_unique<Enemy>();
 	m_Enemy->Initialize();
+	m_Enemy->SetTrans(Vector3(10.0f, 0.0f, 10.0f));
+	m_Enemy->SetPlayer(m_Player.get());
 
 	//カメラにキーボードをセット
 	m_Camera->SetKeyboard(m_keyboard.get());
@@ -170,17 +173,17 @@ void Game::Update(DX::StepTimer const& timer)
 	//m_landshape_sky.Update();
 
 	{//自機の地形へのめり込みを排斥する
-		//自機の当たり判定球を取得
-		Sphere sphere = m_Player->GetCollisionNodeBody();
+		////自機の当たり判定球を取得
+		//Sphere sphere = m_Player->GetCollisionNodeBody();
 
-		//自機のワールド座標を取得
-		Vector3 trans = m_Player->GetTrans();
+		////自機のワールド座標を取得
+		//Vector3 trans = m_Player->GetTrans();
 
-		//球の中心から自機センターのベクトル
-		Vector3 sphere2player = trans - sphere.Center;
+		////球の中心から自機センターのベクトル
+		//Vector3 sphere2player = trans - sphere.Center;
 
-		//めり込み排斥ベクトル
-		Vector3 reject;
+		////めり込み排斥ベクトル
+		//Vector3 reject;
 
 		////地形と球の当たり判定
 		//if (m_landshape_ground.IntersectSphere(sphere, &reject))
@@ -206,25 +209,25 @@ void Game::Update(DX::StepTimer const& timer)
 		//	}
 		//}
 
-		//自機を移動
-		m_Player->SetTrans(sphere.Center + sphere2player);
+		////自機を移動
+		//m_Player->SetTrans(sphere.Center + sphere2player);
 
 		m_Player->Calc();
 	}
 
 	{//自機が地面に立つ処理
-		if (m_Player->GetVelocity().y <= 0.0f)
-		{
-			//自機の頭から足元への線分
-			Segment player_segment;
+		//if (m_Player->GetVelocity().y <= 0.0f)
+		//{
+			////自機の頭から足元への線分
+			//Segment player_segment;
 
-			//自機のワールド座標を取得
-			Vector3 trans = m_Player->GetTrans();
-			player_segment.start = trans + Vector3(0, 1, 0);
-			player_segment.end = trans + Vector3(0, -0.5f, 0);
+			////自機のワールド座標を取得
+			//Vector3 trans = m_Player->GetTrans();
+			//player_segment.start = trans + Vector3(0, 1, 0);
+			//player_segment.end = trans + Vector3(0, -0.5f, 0);
 
 			//交点座標
-			Vector3 inter;
+			//Vector3 inter;
 
 			////地形の線分の当たり判定（レイキャスティング）
 			//for (int i = 0; i < Circle_Num; i++)
@@ -247,9 +250,9 @@ void Game::Update(DX::StepTimer const& timer)
 			//}
 
 			//自機の移動
-			m_Player->SetTrans(trans);
-			m_Player->Calc();
-		}
+			//m_Player->SetTrans(trans);
+			//m_Player->Calc();
+		//}
 	}
 
 	//ModelEffectManager::getInstance()->Update();
