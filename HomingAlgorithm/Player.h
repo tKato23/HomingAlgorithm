@@ -53,7 +53,7 @@ public:
 	const DirectX::SimpleMath::Matrix& GetWor();
 
 	//プレイヤーの移動ベクトルを取得する
-	const DirectX::SimpleMath::Matrix& GetMoveV();
+	const DirectX::SimpleMath::Vector3& GetMoveV();
 
 	//プレイヤーの角度をセットする
 	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
