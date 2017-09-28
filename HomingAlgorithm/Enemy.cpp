@@ -7,6 +7,7 @@ using namespace DirectX::SimpleMath;
 Enemy::Enemy()
 {
 	m_sinAngle = 0.0f;
+	m_Player = nullptr;
 
 	Initialize();
 
@@ -75,7 +76,6 @@ void Enemy::Initialize()
 	//目標角度の初期化
 	m_DistAngle = 0.0f;
 
-
 	{//弾丸用の当たり判定を設定する
 		m_CollisionNodeEnemy.Initialize();
 
@@ -94,10 +94,10 @@ void Enemy::Update()
 	this->Action();
 
 	//定期的に進行方向を変える
-	m_Timer--;	//メンバ変数でタイマーを作り、カウントダウン
+	m_Timer++;	//メンバ変数でタイマーを作り、カウントダウン
 
-	if (m_Timer < 0)
-	{
+	//if (m_Timer < 0)
+	//{
 		////カウントが0に達したらタイマーを60に戻す
 		//m_Timer = 60;
 
@@ -109,7 +109,7 @@ void Enemy::Update()
 
 		////メンバ変数で目標角度を保持
 		//m_DistAngle += rnd;
-	}
+	//}
 
 	//Vector3 angle = m_ObjEnemy[BODY].GetRotation();
 	/*SetRot(Vector3(0, m_DistAngle, 0));*/
@@ -150,7 +150,6 @@ void Enemy::Update()
 		////今の座標を取得
 		//Vector3 trans = m_ObjEnemy[BODY].GetTranslation();
 
-		//m_moveV = Vector3(0, 0, -0.02f);
 		//Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
 		//Matrix rotm = Matrix::CreateRotationY(rotv.y);
 		//m_moveV = Vector3::TransformNormal(m_moveV, rotm);
@@ -169,7 +168,9 @@ void Enemy::Update()
 	m_CollisionNodeEnemy.Update();
 
 	//	プレイヤーへの追尾
-	PrefetchHoming();
+	//PrefetchHoming();
+
+	TurnHoming();
 }
 
 //行列更新
@@ -246,25 +247,21 @@ void Enemy::Action()
 	}
 
 	//移動ベクトル（Z座標）
-	m_moveV = Vector3(0, 0, -0.02f);
+	m_moveV = Vector3(0.0f, 0.0f, 0.0f);
 
 	float angle = m_ObjEnemy[BODY].GetRotation().y;
 
 	//移動量ベクトルを自機の角度分回転させる
 	m_moveV = Vector3::TransformNormal(m_moveV, m_ObjEnemy[BODY].GetWorld());
-
-	//////座標を移動させる
-	//Vector3 pos = m_ObjEnemy[BODY].GetTranslation();
-	//m_ObjEnemy[BODY].SetTranslation(pos + m_moveV);
 }
 
-//エネミーの移動を取得する
+//エネミーの角度を取得する
 const DirectX::SimpleMath::Vector3& Enemy::GetRot()
 {
 	return m_ObjEnemy[BODY].GetRotation();
 }
 
-//エネミーの角度を取得する
+//エネミーの位置を取得する
 const DirectX::SimpleMath::Vector3& Enemy::GetTrans()
 {
 	return m_ObjEnemy[BODY].GetTranslation();
@@ -276,13 +273,13 @@ const DirectX::SimpleMath::Vector3 & Enemy::GetMoveV()
 	return m_moveV;
 }
 
-//エネミーの移動をセットする
+//エネミーの角度をセットする
 void Enemy::SetRot(const Vector3& rotation)
 {
 	m_ObjEnemy[BODY].SetRotation(rotation);
 }
 
-//エネミーの角度をセットする
+//エネミーの位置をセットする
 void Enemy::SetTrans(const Vector3& translation)
 {
 	m_ObjEnemy[BODY].SetTranslation(translation);
@@ -403,11 +400,37 @@ void Enemy::PrefetchHoming()
 //}
 
 //旋回型の自動追尾
-void Enemy::TurnHoming(Vector3 targetPos)
+void Enemy::TurnHoming()
 {
+	//移動ベクトル(速度)
+	m_moveV = Vector3(0.07f, 0.07f, 0.07f);
+
 	//追尾対象(プレイヤー)へのベクトル
-	Vector3 TurnVec = this->GetTrans() - m_Player->GetTrans();
+	Vector3 TurnVec = m_Player->GetTrans() - this->GetTrans();
 
 	//ベクトルの正規化
 	TurnVec.Normalize();
+
+	//追尾対象へのベクトルに移動ベクトルを乗算する
+	TurnVec = TurnVec * m_moveV;
+
+	//座標を移動させる
+	Vector3 pos = this->GetTrans();
+	this->SetTrans(pos + TurnVec);
+
+	this->SetRot(m_Player->GetRot());
+
+	//プレイヤーがエネミーに向かって左から接近
+	//if (TurnVec.x > -5.0f)
+	//{
+		//this->SetTrans(Vector3(m_Player->GetTrans().x + 5.0f, this->GetTrans().y, this->GetTrans().z));
+	//}
+	//if (TurnVec.x < 5.0f && !(TurnVec.x > -5.0f) )
+	//{
+	//	this->SetTrans(Vector3(m_Player->GetTrans().x + 5.0f, this->GetTrans().y, this->GetTrans().z));
+	//}
+
+	//Vector3 speed = TurnVec * this->GetMoveV();
+
+	//this->SetTrans(a);
 }

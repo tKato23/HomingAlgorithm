@@ -43,6 +43,8 @@ public:
 	//エネミーの位置をセットする
 	void SetTrans(const DirectX::SimpleMath::Vector3& translation);
 
+	void SetPlayer(Player* player) { m_Player = player; }
+
 	//エネミーの当たり判定を取得する
 	const SphereNode& GetCollisionNodeEnemy() { return m_CollisionNodeEnemy; }
 
@@ -50,11 +52,9 @@ public:
 	void PrefetchHoming();
 
 	//旋回型の自動追尾
-	void TurnHoming(DirectX::SimpleMath::Vector3 targetPos);
+	void TurnHoming();
 
 	void UpdateBresenham(DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 targetPos);
-
-	void SetPlayer(Player* player) { m_Player = player; }				//プレイヤーをセット
 
 private:
 	//自機の3Dオブジェクト
