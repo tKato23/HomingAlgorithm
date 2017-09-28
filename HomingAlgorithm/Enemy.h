@@ -40,6 +40,9 @@ public:
 	//エネミーの角度をセットする
 	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
 
+	//エネミーの角度をセットする(クォータニオン)
+	void SetRotQ(const DirectX::SimpleMath::Quaternion& rotationQ);
+
 	//エネミーの位置をセットする
 	void SetTrans(const DirectX::SimpleMath::Vector3& translation);
 
@@ -51,24 +54,22 @@ public:
 	//先読み型の自動追尾
 	void PrefetchHoming();
 
+	//	待ち伏せ型の自動追尾
+	void AmbushHoming();
+
 	//旋回型の自動追尾
 	void TurnHoming();
-
-	void UpdateBresenham(DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 targetPos);
 
 private:
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjEnemy;
 
+
 	//	プレイヤー
 	Player* m_Player;
 
-	//	前フレームのターゲット座標
-	static const int STEP_MAX = 100;
-	DirectX::SimpleMath::Vector3 m_nextPos[STEP_MAX];
-	DirectX::SimpleMath::Vector3 m_oldTargetPos;
-	std::vector<DirectX::SimpleMath::Vector3> m_movePos;
-	int m_stepCnt;
+	//	定数
+	const float MOVE_SPEED = -0.01f;
 
 	// サイン用の引数となる角度
 	float m_sinAngle;
