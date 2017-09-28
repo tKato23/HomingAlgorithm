@@ -166,9 +166,8 @@ void Enemy::Update()
 	m_CollisionNodeEnemy.Update();
 
 	//	プレイヤーへの追尾
-	//PrefetchHoming();
-
-	IntervalHoming();
+	//	先読み型のホーミング
+	PrefetchHoming();
 }
 
 //行列更新
@@ -243,9 +242,47 @@ void Enemy::Action()
 			}
 		}
 	}
-
-	//移動ベクトル(速度)
+	//移動ベクトル（Z座標）
 	m_moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
+
+	//移動量ベクトルを自機の角度分回転させる
+	//m_moveV = Vector3::TransformNormal(m_moveV, m_ObjEnemy[BODY].GetWorld());
+}
+
+//エネミーの角度を取得する
+const DirectX::SimpleMath::Vector3& Enemy::GetRot()
+{
+	return m_ObjEnemy[BODY].GetRotation();
+}
+
+//エネミーの位置を取得する
+const DirectX::SimpleMath::Vector3& Enemy::GetTrans()
+{
+	return m_ObjEnemy[BODY].GetTranslation();
+}
+
+//エネミーの移動ベクトルを取得する
+const DirectX::SimpleMath::Vector3 & Enemy::GetMoveV()
+{
+	return m_moveV;
+}
+
+//エネミーの角度をセットする
+void Enemy::SetRot(const Vector3& rotation)
+{
+	m_ObjEnemy[BODY].SetRotation(rotation);
+}
+
+//エネミーの角度をセットする(クォータニオン)
+void Enemy::SetRotQ(const DirectX::SimpleMath::Quaternion & rotationQ)
+{
+	m_ObjEnemy[BODY].SetRotationQ(rotationQ);
+}
+
+//エネミーの位置をセットする
+void Enemy::SetTrans(const Vector3& translation)
+{
+	m_ObjEnemy[BODY].SetTranslation(translation);
 }
 
 //追尾ホーミング
@@ -253,7 +290,6 @@ void Enemy::Action()
 //	先読み型の自動追尾
 void Enemy::PrefetchHoming()
 {
-
 	////	敵とプレイヤー座標の差
 	//Vector3 differencePos = m_Player->GetTrans() - GetTrans();
 
@@ -272,9 +308,7 @@ void Enemy::PrefetchHoming()
 	vel.y = m_Player->GetMoveV().y - GetMoveV().y;
 	vel.z = m_Player->GetMoveV().z - GetMoveV().z;
 
-
 	//	接近時間　
-	//Vector3 time = differencePos / differenceVec;
 	float time = 0.0f;
 	float distance = sqrtf(dis.x * dis.x + dis.y * dis.y + dis.z * dis.z);
 	float velocity = sqrtf(vel.x * vel.x + vel.y * vel.y + vel.z * vel.z);
@@ -291,23 +325,41 @@ void Enemy::PrefetchHoming()
 	//	ベクトル
 	pos = pos - GetTrans();
 
+	//	プレイヤーの方向への移動ベクトルの回転？
+	Vector3 EnemyRot = Vector3(0.0f, pos.y, 0.0f);
+	SetRot(EnemyRot);
 
-	//pos.Normalize();
 	pos = pos * this->GetMoveV();
 
-	////	目標地点
-	//Vector3 targetPoint =  m_Player->GetTrans() + (m_Player->GetMoveV() * time);
-
-	////	予測点の方向
-	//Vector3 dir = targetPoint - GetTrans();
-	//dir.Normalize();
-
-	////	敵の移動先
-	//Vector3 move = dir * GetMoveV();
-
-
 	//	敵に反映させる
-	this->SetTrans(GetTrans() - pos);
+	this->SetTrans(this->GetTrans() - pos);
+}
+
+//	待ち伏せ型の自動追尾
+void Enemy::AmbushHoming()
+{
+	//移動ベクトル(速度)
+	m_moveV = Vector3(0.07f, 0.07f, 0.07f);
+
+	//追尾対象(プレイヤー)へのベクトル
+	Vector3 TurnVec = m_Player->GetTrans() - this->GetTrans();
+
+	//	一定距離以内なら追尾を行う
+	if (TurnVec.x < 10.0f &&  TurnVec.x > -10.0f && TurnVec.y <= 10.0f 
+		&& TurnVec.y > -10.0f && TurnVec.z < 10.0f && TurnVec.z > -10.0f)
+	{
+		//ベクトルの正規化
+		TurnVec.Normalize();
+
+		//追尾対象へのベクトルに移動ベクトルを乗算する
+		TurnVec = TurnVec * m_moveV;
+
+		//座標を移動させる
+		Vector3 pos = this->GetTrans();
+		this->SetTrans(pos + TurnVec);
+
+		this->SetRot(m_Player->GetRot());
+	}
 }
 
 //間合い確保型の自動追尾
