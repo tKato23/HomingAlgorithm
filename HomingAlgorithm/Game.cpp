@@ -64,10 +64,11 @@ void Game::Initialize(HWND window, int width, int height)
 	// プレイヤーの生成
 	m_Player = std::make_unique<Player>(m_keyboard.get());
 	m_Player->Initialize();
+	//m_Player->SetTrans(Vector3(0.0f, 30.0f, 0.0f));
 
 	m_Enemy = std::make_unique<Enemy>();
 	m_Enemy->Initialize();
-	m_Enemy->SetTrans(Vector3(10.0f, 0.0f, 10.0f));
+	m_Enemy->SetTrans(Vector3(-20.0f, 0.0f, -20.0f));
 	m_Enemy->SetPlayer(m_Player.get());
 
 	//カメラにキーボードをセット
@@ -141,6 +142,7 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const& timer)
 {
+
 	float elapsedTime = float(timer.GetElapsedSeconds());
 
 	// TODO: Add your game logic here.
@@ -255,6 +257,9 @@ void Game::Update(DX::StepTimer const& timer)
 	}
 
 	//ModelEffectManager::getInstance()->Update();
+
+	m_debugText->AddText(Vector2(0, 10), L"%f", m_Player->GetMoveV().z);
+
 }
 
 // Draws the scene.
@@ -386,6 +391,7 @@ void Game::GetDefaultSize(int& width, int& height) const
     width = 800;
     height = 600;
 }
+
 
 // These are the resources that depend on the device.
 void Game::CreateDevice()

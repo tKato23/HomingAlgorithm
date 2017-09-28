@@ -51,6 +51,9 @@ public:
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
 
+	//	デバッグのため敵をプレイヤーから一定距離離す
+	void separateEnemy();
+
 private:
     void Update(DX::StepTimer const& timer);
     void Render();

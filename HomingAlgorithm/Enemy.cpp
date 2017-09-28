@@ -246,7 +246,7 @@ void Enemy::Action()
 	}
 
 	//移動ベクトル（Z座標）
-	m_moveV = Vector3(0, 0, -0.02f);
+	m_moveV = Vector3(0.0f, 0.0f, -0.02f);
 
 	float angle = m_ObjEnemy[BODY].GetRotation().y;
 
@@ -331,6 +331,8 @@ void Enemy::PrefetchHoming()
 	//	ベクトル
 	pos = pos - GetTrans();
 
+	Vector3 EnemyRot = Vector3(0.0f, pos.y, 0.0f);
+	SetRot(EnemyRot);
 
 	//pos.Normalize();
 	pos = pos * this->GetMoveV();
