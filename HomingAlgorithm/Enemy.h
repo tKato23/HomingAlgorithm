@@ -29,34 +29,41 @@ public:
 	void Action();
 
 	//エネミーの角度を取得する
-	const DirectX::SimpleMath::Vector3& GetRot();
+	const DirectX::SimpleMath::Vector3& GetRot() { return m_ObjEnemy[BODY].GetRotation(); };
+
+	//エネミーのクオータニオンを取得する
+	const DirectX::SimpleMath::Quaternion& GetRotQ() { return m_ObjEnemy[BODY].GetRotationQ(); };
 
 	//エネミーの位置を取得する
-	const DirectX::SimpleMath::Vector3& GetTrans();
+	const DirectX::SimpleMath::Vector3& GetTrans() { return m_ObjEnemy[BODY].GetTranslation(); }
 
 	//エネミーの移動ベクトルを取得する
-	const DirectX::SimpleMath::Vector3& GetMoveV();
-
-	//エネミーの角度をセットする
-	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
-
-	//エネミーの位置をセットする
-	void SetTrans(const DirectX::SimpleMath::Vector3& translation);
-
-	void SetPlayer(Player* player) { m_Player = player; }
+	const DirectX::SimpleMath::Vector3& GetMoveV() { return m_moveV; }
 
 	//エネミーの当たり判定を取得する
 	const SphereNode& GetCollisionNodeEnemy() { return m_CollisionNodeEnemy; }
 
+	//エネミーの角度をセットする
+	void SetRot(const DirectX::SimpleMath::Vector3& rotation) { m_ObjEnemy[BODY].SetRotation(rotation); }
+
+	//エネミーの角度をセットする
+	void SetRotQ(const DirectX::SimpleMath::Quaternion& quaternion) { m_ObjEnemy[BODY].SetRotationQ(quaternion); }
+
+	//エネミーの位置をセットする
+	void SetTrans(const DirectX::SimpleMath::Vector3& translation) { m_ObjEnemy[BODY].SetTranslation(translation); }
+
+	void SetPlayer(Player* player) { m_Player = player; }
+
 	//先読み型の自動追尾
 	void PrefetchHoming();
 
-	//旋回型の自動追尾
-	void TurnHoming();
-
-	void UpdateBresenham(DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 targetPos);
+	//間合い確保型の自動追尾
+	void IntervalHoming();
 
 private:
+	//定数宣言
+	const float MOVE_SPEED = 0.07f;		//機体の回転速度
+
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjEnemy;
 

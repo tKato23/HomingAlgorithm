@@ -227,6 +227,12 @@ const DirectX::SimpleMath::Vector3& Player::GetRot()
 	return m_ObjPlayer[BODY].GetRotation();
 }
 
+//プレイヤーのクオータニオンを取得する
+const DirectX::SimpleMath::Quaternion & Player::GetRotQ()
+{
+	return m_ObjPlayer[BODY].GetRotationQ();
+}
+
 //プレイヤーの角度を取得する
 const DirectX::SimpleMath::Vector3& Player::GetTrans()
 {

@@ -46,6 +46,9 @@ public:
 	//プレイヤーの角度を取得する
 	const DirectX::SimpleMath::Vector3& GetRot();
 
+	//プレイヤーのクオータニオンを取得する
+	const DirectX::SimpleMath::Quaternion& GetRotQ();
+
 	//プレイヤーの位置を取得する
 	const DirectX::SimpleMath::Vector3& GetTrans();
 
