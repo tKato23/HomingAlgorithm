@@ -139,13 +139,13 @@ void Player::Action()
 		Vector3 trans = m_ObjPlayer[BODY].GetTranslation();
 
 		//移動ベクトル(Z座標の前進)
-		SimpleMath::Vector3 moveV(0.0f, 0.0f, -0.1f);
+		m_moveV = Vector3(0.0f, 0.0f, -0.1f);
 
 		//移動ベクトルを回転する
-		moveV = Vector3::TransformNormal(moveV, m_ObjPlayer[BODY].GetWorld());
+		m_moveV = Vector3::TransformNormal(m_moveV, m_ObjPlayer[BODY].GetWorld());
 
 		//移動
-		trans += moveV;
+		trans += m_moveV;
 
 		//移動した座標を反映
 		m_ObjPlayer[BODY].SetTranslation(trans);
