@@ -133,19 +133,19 @@ void Player::Action()
 	m_ObjPlayer[BODY].SetTranslation(trans);
 
 	//Wキーを押すと
-	if (keystate.W)
+	if (keystate.W || keystate.Up)
 	{
 		//現在の座標・回転角を取得
 		Vector3 trans = m_ObjPlayer[BODY].GetTranslation();
 
 		//移動ベクトル(Z座標の前進)
-		SimpleMath::Vector3 moveV(0.0f, 0.0f, -0.1f);
+		m_moveV = Vector3(0.0f, 0.0f, -0.1f);
 
 		//移動ベクトルを回転する
-		moveV = Vector3::TransformNormal(moveV, m_ObjPlayer[BODY].GetWorld());
+		m_moveV = Vector3::TransformNormal(m_moveV, m_ObjPlayer[BODY].GetWorld());
 
 		//移動
-		trans += moveV;
+		trans += m_moveV;
 
 		//移動した座標を反映
 		m_ObjPlayer[BODY].SetTranslation(trans);
@@ -160,7 +160,7 @@ void Player::Action()
 	}
 
 	//Sキーを押すと
-	if (keystate.S)
+	if (keystate.S || keystate.Down)
 	{
 		//現在の座標・回転角を取得
 		Vector3 trans = m_ObjPlayer[BODY].GetTranslation();
@@ -187,7 +187,7 @@ void Player::Action()
 	}
 
 	//Aキーを押すと
-	if (keystate.A)
+	if (keystate.A || keystate.Left)
 	{
 		//現在の角度を取得
 		Quaternion rot = m_ObjPlayer[BODY].GetRotationQ();
@@ -199,7 +199,7 @@ void Player::Action()
 	}
 
 	//Dキーを押すと
-	if (keystate.D)
+	if (keystate.D || keystate.Right)
 	{
 		//現在の角度を取得
 		Quaternion rot = m_ObjPlayer[BODY].GetRotationQ();
@@ -225,6 +225,12 @@ void Player::Action()
 const DirectX::SimpleMath::Vector3& Player::GetRot()
 {
 	return m_ObjPlayer[BODY].GetRotation();
+}
+
+//プレイヤーのクオータニオンを取得する
+const DirectX::SimpleMath::Quaternion & Player::GetRotQ()
+{
+	return m_ObjPlayer[BODY].GetRotationQ();
 }
 
 //プレイヤーの角度を取得する

@@ -29,24 +29,30 @@ public:
 	void Action();
 
 	//エネミーの角度を取得する
-	const DirectX::SimpleMath::Vector3& GetRot();
+	const DirectX::SimpleMath::Vector3& GetRot() { return m_ObjEnemy[BODY].GetRotation(); };
+
+	//エネミーのクオータニオンを取得する
+	const DirectX::SimpleMath::Quaternion& GetRotQ() { return m_ObjEnemy[BODY].GetRotationQ(); };
 
 	//エネミーの位置を取得する
-	const DirectX::SimpleMath::Vector3& GetTrans();
+	const DirectX::SimpleMath::Vector3& GetTrans() { return m_ObjEnemy[BODY].GetTranslation(); }
 
 	//エネミーの移動ベクトルを取得する
-	const DirectX::SimpleMath::Vector3& GetMoveV();
-
-	//エネミーの角度をセットする
-	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
-
-	//エネミーの位置をセットする
-	void SetTrans(const DirectX::SimpleMath::Vector3& translation);
-
-	void SetPlayer(Player* player) { m_Player = player; }
+	const DirectX::SimpleMath::Vector3& GetMoveV() { return m_moveV; }
 
 	//エネミーの当たり判定を取得する
 	const SphereNode& GetCollisionNodeEnemy() { return m_CollisionNodeEnemy; }
+
+	//エネミーの角度をセットする
+	void SetRot(const DirectX::SimpleMath::Vector3& rotation) { m_ObjEnemy[BODY].SetRotation(rotation); }
+
+	//エネミーの角度をセットする
+	void SetRotQ(const DirectX::SimpleMath::Quaternion& quaternion) { m_ObjEnemy[BODY].SetRotationQ(quaternion); }
+
+	//エネミーの位置をセットする
+	void SetTrans(const DirectX::SimpleMath::Vector3& translation) { m_ObjEnemy[BODY].SetTranslation(translation); }
+
+	void SetPlayer(Player* player) { m_Player = player; }
 
 	//追跡型の自動追尾
 	void PursuitHouming();
@@ -54,24 +60,23 @@ public:
 	//先読み型の自動追尾
 	void PrefetchHoming();
 
-	//旋回型の自動追尾
-	void TurnHoming();
+	//間合い確保型の自動追尾
+	void IntervalHoming();
 
-	void UpdateBresenham(DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 targetPos);
+	//	待ち伏せ型の自動追尾
+	void AmbushHoming();
 
 private:
+
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjEnemy;
+
 
 	//	プレイヤー
 	Player* m_Player;
 
-	//	前フレームのターゲット座標
-	static const int STEP_MAX = 100;
-	DirectX::SimpleMath::Vector3 m_nextPos[STEP_MAX];
-	DirectX::SimpleMath::Vector3 m_oldTargetPos;
-	std::vector<DirectX::SimpleMath::Vector3> m_movePos;
-	int m_stepCnt;
+	//	定数
+	const float MOVE_SPEED = -0.02f;
 
 	// サイン用の引数となる角度
 	float m_sinAngle;
