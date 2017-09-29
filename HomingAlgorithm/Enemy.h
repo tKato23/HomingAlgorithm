@@ -48,6 +48,9 @@ public:
 	//エネミーの当たり判定を取得する
 	const SphereNode& GetCollisionNodeEnemy() { return m_CollisionNodeEnemy; }
 
+	//追跡型の自動追尾
+	void PursuitHouming();
+
 	//先読み型の自動追尾
 	void PrefetchHoming();
 

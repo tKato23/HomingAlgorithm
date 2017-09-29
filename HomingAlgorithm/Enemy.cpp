@@ -96,10 +96,10 @@ void Enemy::Update()
 	//定期的に進行方向を変える
 	m_Timer++;	//メンバ変数でタイマーを作り、カウントダウン
 
-	//if (m_Timer < 0)
-	//{
-		////カウントが0に達したらタイマーを60に戻す
-		//m_Timer = 60;
+	if (m_Timer < 0)
+	{
+		//カウントが0に達したらタイマーを60に戻す
+		m_Timer = 1;
 
 		////目標角度を変更
 		//float rnd = (float)rand() / RAND_MAX - 0.5f;
@@ -109,10 +109,10 @@ void Enemy::Update()
 
 		////メンバ変数で目標角度を保持
 		//m_DistAngle += rnd;
-	//}
+	}
 
-	//Vector3 angle = m_ObjEnemy[BODY].GetRotation();
-	/*SetRot(Vector3(0, m_DistAngle, 0));*/
+	/*Vector3 angle = m_ObjEnemy[BODY].GetRotation();
+	SetRot(Vector3(0, m_DistAngle, 0));*/
 
 	//目標角度に向かって、機体の角度を補間する
 	{
@@ -168,9 +168,11 @@ void Enemy::Update()
 	m_CollisionNodeEnemy.Update();
 
 	//	プレイヤーへの追尾
+	PursuitHouming();
+
 	//PrefetchHoming();
 
-	TurnHoming();
+	//TurnHoming();
 }
 
 //行列更新
@@ -285,7 +287,23 @@ void Enemy::SetTrans(const Vector3& translation)
 	m_ObjEnemy[BODY].SetTranslation(translation);
 }
 
-//追尾ホーミング
+//追跡型の自動追尾
+void Enemy::PursuitHouming()
+{
+	//移動ベクトル(速度)
+	m_moveV = Vector3(0.07f, 0.07f, 0.07f);
+
+	//プレイヤーへの向き
+	Vector3 direction = m_Player->GetTrans() - this->GetTrans();
+	//正規化
+	direction.Normalize();
+	//速度ベクトル
+	direction = direction*m_moveV;
+	//座標を移動させる
+	Vector3 pos = this->GetTrans();
+	this->SetTrans(pos + direction);
+	this->SetRot(m_Player->GetRot());
+}
 
 //	先読み型の自動追尾
 void Enemy::PrefetchHoming()
