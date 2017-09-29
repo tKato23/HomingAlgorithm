@@ -29,20 +29,21 @@ public:
 	void Action();
 
 	//エネミーの角度を取得する
-	const DirectX::SimpleMath::Vector3& GetRot();
+	const DirectX::SimpleMath::Vector3& GetRot() { return m_ObjEnemy[BODY].GetRotation(); }
 
 	//エネミーの位置を取得する
-	const DirectX::SimpleMath::Vector3& GetTrans();
+	const DirectX::SimpleMath::Vector3& GetTrans() { return m_ObjEnemy[BODY].GetTranslation(); }
 
 	//エネミーの移動ベクトルを取得する
-	const DirectX::SimpleMath::Vector3& GetMoveV();
+	const DirectX::SimpleMath::Vector3& GetMoveV() { return m_moveV; }
 
 	//エネミーの角度をセットする
-	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
+	void SetRot(const DirectX::SimpleMath::Vector3& rotation) { m_ObjEnemy[BODY].SetRotation(rotation); }
 
 	//エネミーの位置をセットする
-	void SetTrans(const DirectX::SimpleMath::Vector3& translation);
+	void SetTrans(const DirectX::SimpleMath::Vector3& translation) { m_ObjEnemy[BODY].SetTranslation(translation); }
 
+	//プレイヤーをセットする
 	void SetPlayer(Player* player) { m_Player = player; }
 
 	//エネミーの当たり判定を取得する
@@ -51,8 +52,8 @@ public:
 	//先読み型の自動追尾
 	void PrefetchHoming(DirectX::SimpleMath::Vector3 targetPos);
 
-	//旋回型の自動追尾
-	void TurnHoming();
+	//間合い確保型の自動追尾
+	void IntervalHoming();
 
 private:
 	//自機の3Dオブジェクト
