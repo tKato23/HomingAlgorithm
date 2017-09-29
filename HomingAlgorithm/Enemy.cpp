@@ -10,9 +10,6 @@ Enemy::Enemy()
 	m_Player = nullptr;
 
 	Initialize();
-
-	//	初期化処理
-	m_Player = nullptr;
 }
 
 //デストラクタ
@@ -68,109 +65,13 @@ void Enemy::Update()
 	//ロボットの挙動の更新
 	this->Action();
 
-	////定期的に進行方向を変える
-	//m_Timer--;	//メンバ変数でタイマーを作り、カウントダウン
+	IntervalHoming();
 
-
-	if (m_Timer < 0)
-	{
-		//カウントが0に達したらタイマーを60に戻す
-		//_Timer = 1;
-
-	//if (m_Timer < 0)
-	//{
-	//	//カウントが0に達したらタイマーを60に戻す
-	//	m_Timer = 60;
-
-
-	//	//目標角度を変更
-	//	float rnd = (float)rand() / RAND_MAX - 0.5f;
-	//	rnd *= 180.0f;
-
-	//	rnd = XMConvertToRadians(rnd);
-
-
-		////メンバ変数で目標角度を保持
-		//m_DistAngle += rnd;
-	}
-
-	/*Vector3 angle = m_ObjEnemy[BODY].GetRotation();
-	SetRot(Vector3(0, m_DistAngle, 0));*/
-
-	//	//メンバ変数で目標角度を保持
-	//	m_DistAngle += rnd;
-	//}
-
-	//Vector3 angle = m_ObjEnemy[BODY].GetRotation();
-	///*SetRot(Vector3(0, m_DistAngle, 0));*/
-
-
-	////目標角度に向かって、機体の角度を補間する
-	//{
-	//	//敵の角度を回転させる
-	//	Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
-
-	//	////目標角度への、最短角度を取得
-	//	//float angle = GetShortAngleRad(rotv.y, XMConvertToRadians(m_DistAngle));
-	//	
-	//	
-	//	float angle = m_DistAngle - rotv.y;
-
-	//	//180度を超える場合、逆回りにする
-	//	if (angle > XM_PI)
-	//	{
-	//		angle -= XM_2PI;
-	//	}
-
-	//	if (angle < -XM_PI)
-	//	{
-	//		angle += XM_2PI;
-	//	}
-
-
-	//	//補間
-	//	rotv.y += angle * 0.01f;
-
-	//	SetRot(rotv);
-
-	//	m_ObjEnemy[BODY].SetRotation(rotv);
-	//}
-
-	//機体の向いている方向に進む
-	{
-		////今の座標を取得
-		//Vector3 trans = m_ObjEnemy[BODY].GetTranslation();
-
-		//Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
-		//Matrix rotm = Matrix::CreateRotationY(rotv.y);
-		//m_moveV = Vector3::TransformNormal(m_moveV, rotm);
-
-		////座標を移動
-		//trans += m_moveV;
-
-	//当たり判定の更新
-		m_CollisionNodeEnemy.Update();
-
-		IntervalHoming();
-
-		//各パーツの更新
-		Calc();
-	}
+	//各パーツの更新
+	Calc();
 
 	//当たり判定の更新
 	m_CollisionNodeEnemy.Update();
-
-	//	プレイヤーへの追尾
-
-	//PursuitHouming();
-
-	//PrefetchHoming();
-
-	//TurnHoming();
-
-	//	先読み型のホーミング
-	//PrefetchHoming();
-
 }
 
 //行列更新
@@ -245,9 +146,6 @@ void Enemy::Action()
 			}
 		}
 	}
-	//移動ベクトル（Z座標）
-	m_moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
-
 	//移動量ベクトルを自機の角度分回転させる
 	//m_moveV = Vector3::TransformNormal(m_moveV, m_ObjEnemy[BODY].GetWorld());
 }
@@ -274,12 +172,6 @@ void Enemy::PursuitHouming()
 //	先読み型の自動追尾
 void Enemy::PrefetchHoming()
 {
-	////	敵とプレイヤー座標の差
-	//Vector3 differencePos = m_Player->GetTrans() - GetTrans();
-
-	////	移動ベクトルの差
-	//Vector3 differenceVec = m_Player->GetMoveV() - GetMoveV();
-
 	//	相対距離
 	Vector3 dis;
 	dis.x = m_Player->GetTrans().x - GetTrans().x;
@@ -336,43 +228,28 @@ void Enemy::AmbushHoming()
 //間合い確保型の自動追尾
 void Enemy::IntervalHoming()
 {
+	//移動ベクトル
+	m_moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
+
 	//追尾対象(プレイヤー)へのベクトル
-	Vector3 TurnVec = m_Player->GetTrans() - this->GetTrans();
+	Vector3 Vec = m_Player->GetTrans() - this->GetTrans();
+
+	float angle_X = atan2f(Vec.z, Vec.y);
+	float angle_Y = atan2f(Vec.x, Vec.z);
+	float angle_Z = atan2f(Vec.y, Vec.x);
+
+	this->SetRot(Vector3(angle_X + XM_PI, angle_Y + XM_PI, 0.0f));
+	//this->SetRot(Vector3(0.0f, angle_Y, 0.0f));
 
 	//ベクトルの正規化
-	TurnVec.Normalize();
+	Vec.Normalize();
 
 	//追尾対象へのベクトルに移動ベクトルを乗算する
-	TurnVec = TurnVec * m_moveV;
+	Vec = Vec * m_moveV;
 
 	//座標を移動させる
 	Vector3 pos = this->GetTrans();
-	this->SetTrans(pos + TurnVec);
+	this->SetTrans(pos + Vec);
 
-	//目標角度に向かって、機体の角度を補間する
 
-	//敵の角度を回転させる
-	Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
-
-	float angle = m_DistAngle - rotv.y;
-
-	//180度を超える場合、逆回りにする
-	if (angle > XM_PI)
-	{
-		angle -= XM_2PI;
-	}
-
-	if (angle < -XM_PI)
-	{
-		angle += XM_2PI;
-	}
-
-	//補間
-	rotv.y += angle * 0.01f;
-
-	rotv.y = 90.0f;
-
-	this->SetRot(rotv);
-
-	//m_ObjEnemy[BODY].SetRotation(rotv);
 }

@@ -77,7 +77,7 @@ private:
 	Player* m_Player;
 
 	//	定数
-	const float MOVE_SPEED = -0.02f;
+	const float MOVE_SPEED = 0.08f;
 
 	// サイン用の引数となる角度
 	float m_sinAngle;

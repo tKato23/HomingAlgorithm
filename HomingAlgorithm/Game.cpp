@@ -260,8 +260,9 @@ void Game::Update(DX::StepTimer const& timer)
 	//ModelEffectManager::getInstance()->Update();
 
 	//	デバッグ表示
-	m_debugText->AddText(Vector2(0, 10), L"%f", m_Enemy->GetTrans().x);
-
+	m_debugText->AddText(Vector2(0, 10), L"X %f", m_Enemy->GetTrans().x);
+	m_debugText->AddText(Vector2(0, 30), L"Y %f", m_Enemy->GetTrans().y);
+	m_debugText->AddText(Vector2(0, 50), L"Z %f", m_Enemy->GetTrans().z);
 }
 
 // Draws the scene.
