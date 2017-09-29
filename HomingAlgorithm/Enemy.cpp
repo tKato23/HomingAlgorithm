@@ -36,38 +36,23 @@ void Enemy::Initialize()
 
 	//パーツを親子関係をセット
 	m_ObjEnemy[L_WING].SetParent(&m_ObjEnemy[BODY]);
-
 	m_ObjEnemy[R_WING].SetParent(&m_ObjEnemy[BODY]);
-
 	m_ObjEnemy[L_ENGINE].SetParent(&m_ObjEnemy[BODY]);
-
 	m_ObjEnemy[R_ENGINE].SetParent(&m_ObjEnemy[BODY]);
-
 	m_ObjEnemy[L_WEAPON].SetParent(&m_ObjEnemy[L_WING]);
-
 	m_ObjEnemy[R_WEAPON].SetParent(&m_ObjEnemy[R_WING]);
 
 	//親からのオフセット(座標のずらし分)をセット
 	m_ObjEnemy[BODY].SetTranslation(Vector3(0.0f, 2.0f, 0.0f));
-
 	m_ObjEnemy[L_WING].SetTranslation(Vector3(0.0f, 0.0f, 0.0f));
-
 	m_ObjEnemy[R_WING].SetTranslation(Vector3(0.0f, 0.0f, 0.0f));
-
 	m_ObjEnemy[L_ENGINE].SetTranslation(Vector3(-0.1f, 0.0f, 0.5f));
-
 	m_ObjEnemy[L_ENGINE].SetScale(Vector3(0.75f, 0.75f, 0.75f));
-
 	m_ObjEnemy[R_ENGINE].SetTranslation(Vector3(0.1f, 0.0f, 0.5f));
-
 	m_ObjEnemy[R_ENGINE].SetScale(Vector3(0.75f, 0.75f, 0.75f));
-
 	m_ObjEnemy[L_WEAPON].SetTranslation(Vector3(-0.5f, -0.05f, -0.025f));
-
 	m_ObjEnemy[L_WEAPON].SetScale(Vector3(0.75f, 0.75f, 0.6f));
-
 	m_ObjEnemy[R_WEAPON].SetTranslation(Vector3(0.5f, -0.05f, -0.025f));
-
 	m_ObjEnemy[R_WEAPON].SetScale(Vector3(0.75f, 0.75f, 0.6f));
 
 	//タイマーの初期化
@@ -75,14 +60,6 @@ void Enemy::Initialize()
 
 	//目標角度の初期化
 	m_DistAngle = 0.0f;
-
-	{//弾丸用の当たり判定を設定する
-		m_CollisionNodeEnemy.Initialize();
-
-		m_CollisionNodeEnemy.SetParent(&m_ObjEnemy[BODY]);
-		m_CollisionNodeEnemy.SetTrans(Vector3(0, 0, 0));
-		m_CollisionNodeEnemy.SetLocalRadius(Vector3(0.8f, 0.8f, 0.8f));
-	}
 }
 
 //更新処理
@@ -98,7 +75,7 @@ void Enemy::Update()
 	if (m_Timer < 0)
 	{
 		//カウントが0に達したらタイマーを60に戻す
-		m_Timer = 1;
+		//_Timer = 1;
 
 	//if (m_Timer < 0)
 	//{
@@ -171,19 +148,21 @@ void Enemy::Update()
 		////座標を移動
 		//trans += m_moveV;
 
-		////移動後の座標をセット
-		//m_ObjEnemy[BODY].SetTranslation(trans);
-	}
+	//当たり判定の更新
+		m_CollisionNodeEnemy.Update();
 
-	//各パーツの更新
-	Calc();
+		IntervalHoming();
+
+		//各パーツの更新
+		Calc();
+	}
 
 	//当たり判定の更新
 	m_CollisionNodeEnemy.Update();
 
 	//	プレイヤーへの追尾
 
-	PursuitHouming();
+	//PursuitHouming();
 
 	//PrefetchHoming();
 
@@ -318,34 +297,21 @@ void Enemy::PrefetchHoming()
 	float distance = sqrtf(dis.x * dis.x + dis.y * dis.y + dis.z * dis.z);
 	float velocity = sqrtf(vel.x * vel.x + vel.y * vel.y + vel.z * vel.z);
 
-	time = distance / velocity;
-	time = fabsf(time);
+	//float angle = m_ObjEnemy[BODY].GetRotation().y;
 
-	//	予測地点
-	Vector3 pos;
-	pos.x = m_Player->GetTrans().x + (m_Player->GetMoveV().x * time);
-	pos.y = m_Player->GetTrans().y + (m_Player->GetMoveV().y * time);
-	pos.z = m_Player->GetTrans().z + (m_Player->GetMoveV().z * time);
+	//移動量ベクトルを自機の角度分回転させる
+	//m_moveV = Vector3::TransformNormal(m_moveV, m_ObjEnemy[BODY].GetWorld());
 
-	//	ベクトル
-	pos = pos - GetTrans();
 
-	//	プレイヤーの方向への移動ベクトルの回転？
-	Vector3 EnemyRot = Vector3(0.0f, pos.y, 0.0f);
-	SetRot(EnemyRot);
-
-	pos = pos * this->GetMoveV();
-
-	//	敵に反映させる
-	this->SetTrans(this->GetTrans() - pos);
-}
-
-//	待ち伏せ型の自動追尾
-void Enemy::AmbushHoming()
-{
 	//移動ベクトル(速度)
 	m_moveV = Vector3(0.07f, 0.07f, 0.07f);
 
+}
+
+
+//待ち伏せ型の自動追尾
+void Enemy::AmbushHoming()
+{
 	//追尾対象(プレイヤー)へのベクトル
 	Vector3 TurnVec = m_Player->GetTrans() - this->GetTrans();
 
@@ -382,4 +348,31 @@ void Enemy::IntervalHoming()
 	//座標を移動させる
 	Vector3 pos = this->GetTrans();
 	this->SetTrans(pos + TurnVec);
+
+	//目標角度に向かって、機体の角度を補間する
+
+	//敵の角度を回転させる
+	Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
+
+	float angle = m_DistAngle - rotv.y;
+
+	//180度を超える場合、逆回りにする
+	if (angle > XM_PI)
+	{
+		angle -= XM_2PI;
+	}
+
+	if (angle < -XM_PI)
+	{
+		angle += XM_2PI;
+	}
+
+	//補間
+	rotv.y += angle * 0.01f;
+
+	rotv.y = 90.0f;
+
+	this->SetRot(rotv);
+
+	//m_ObjEnemy[BODY].SetRotation(rotv);
 }
