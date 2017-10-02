@@ -6,6 +6,8 @@
 #include "Obj3d.h"
 #include "CollisionNode.h"
 #include "Player.h"
+#include "Strategy.h"
+
 
 class Enemy
 {
@@ -49,9 +51,6 @@ public:
 	//エネミーの角度をセットする
 	void SetRotQ(const DirectX::SimpleMath::Quaternion& quaternion) { m_ObjEnemy[BODY].SetRotationQ(quaternion); }
 
-	//エネミーの角度をセットする(クォータニオン)
-	void SetRotQ(const DirectX::SimpleMath::Quaternion& rotationQ);
-
 	//エネミーの位置をセットする
 	void SetTrans(const DirectX::SimpleMath::Vector3& translation) { m_ObjEnemy[BODY].SetTranslation(translation); }
 
@@ -66,19 +65,28 @@ public:
 	//	待ち伏せ型の自動追尾
 	void AmbushHoming();
 
+	//	ホーミングのフラグをセットする
+	void SetHomingFlag(bool flag);
+
+	//	タイプの取得とセット
+	Homing::Type getCurrentType() { return m_currentType; }
+	void SetHomingType(Homing::Type type) { m_currentType = type; }
+
+	Homing** getHomingDictionary() { return m_homingDictionary; }
+	void addStrategy(Homing::Type type);
+	void HomingExecute();
+
 private:
-	//定数宣言
-	const float MOVE_SPEED = 0.07f;		//機体の回転速度
 
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjEnemy;
-
 
 	//	プレイヤー
 	Player* m_Player;
 
 	//	定数
-	const float MOVE_SPEED = -0.02f;
+	static const float MOVE_SPEED;
+	static const int MAX_STRATEGY_NUM = 4;
 
 	// サイン用の引数となる角度
 	float m_sinAngle;
@@ -91,10 +99,6 @@ private:
 
 	//目標角度
 	float m_DistAngle;
-
-	//ミサイル攻撃を管理するフラグ
-	bool m_weapon_flag;
-	bool m_a_flag;
 
 	//自機パーツ
 	enum ENEMYPARTS
@@ -112,4 +116,10 @@ private:
 
 	//エネミーの当たり判定
 	SphereNode m_CollisionNodeEnemy;
+
+	//	ホーミングを実行するフラグ
+	bool m_homingFlag;
+
+	Homing* m_homingDictionary[MAX_STRATEGY_NUM];
+	Homing::Type m_currentType;
 };

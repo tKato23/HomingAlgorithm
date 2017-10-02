@@ -1,7 +1,11 @@
 #include "Enemy.h"
+#include <math.h>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
+
+//	静的メンバ定数の定義
+const float Enemy::MOVE_SPEED = -0.02f;
 
 //コンストラクタ
 Enemy::Enemy()
@@ -83,6 +87,25 @@ void Enemy::Initialize()
 		m_CollisionNodeEnemy.SetTrans(Vector3(0, 0, 0));
 		m_CollisionNodeEnemy.SetLocalRadius(Vector3(0.8f, 0.8f, 0.8f));
 	}
+
+	m_homingFlag = false;
+
+	//	タイプの配列
+	Homing::Type strategyTypearray[] = {
+		Homing::PREFETCH,
+		Homing::INTERVAL,
+		Homing::AMBUSH,
+		Homing::PURSUIT
+	};
+
+	//	それぞれのタイプを追加
+	for (int i = 0; i < MAX_STRATEGY_NUM; i++)
+	{
+		addStrategy(strategyTypearray[i]);
+	}
+
+	//	初期化として先読み型をセット
+	this->SetHomingType(Homing::Type::PREFETCH);
 }
 
 //更新処理
@@ -91,73 +114,6 @@ void Enemy::Update()
 	//ロボットの挙動の更新
 	this->Action();
 
-	////定期的に進行方向を変える
-	//m_Timer--;	//メンバ変数でタイマーを作り、カウントダウン
-
-	//if (m_Timer < 0)
-	//{
-	//	//カウントが0に達したらタイマーを60に戻す
-	//	m_Timer = 60;
-
-	//	//目標角度を変更
-	//	float rnd = (float)rand() / RAND_MAX - 0.5f;
-	//	rnd *= 180.0f;
-
-	//	rnd = XMConvertToRadians(rnd);
-
-	//	//メンバ変数で目標角度を保持
-	//	m_DistAngle += rnd;
-	//}
-
-	//Vector3 angle = m_ObjEnemy[BODY].GetRotation();
-	///*SetRot(Vector3(0, m_DistAngle, 0));*/
-
-	////目標角度に向かって、機体の角度を補間する
-	//{
-	//	//敵の角度を回転させる
-	//	Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
-
-	//	////目標角度への、最短角度を取得
-	//	//float angle = GetShortAngleRad(rotv.y, XMConvertToRadians(m_DistAngle));
-	//	
-	//	
-	//	float angle = m_DistAngle - rotv.y;
-
-	//	//180度を超える場合、逆回りにする
-	//	if (angle > XM_PI)
-	//	{
-	//		angle -= XM_2PI;
-	//	}
-
-	//	if (angle < -XM_PI)
-	//	{
-	//		angle += XM_2PI;
-	//	}
-
-
-	//	//補間
-	//	rotv.y += angle * 0.01f;
-
-	//	SetRot(rotv);
-
-	//	m_ObjEnemy[BODY].SetRotation(rotv);
-	//}
-
-	//機体の向いている方向に進む
-	{
-		////今の座標を取得
-		//Vector3 trans = m_ObjEnemy[BODY].GetTranslation();
-
-		//Vector3 rotv = m_ObjEnemy[BODY].GetRotation();
-		//Matrix rotm = Matrix::CreateRotationY(rotv.y);
-		//m_moveV = Vector3::TransformNormal(m_moveV, rotm);
-
-		////座標を移動
-		//trans += m_moveV;
-
-		////移動後の座標をセット
-		//m_ObjEnemy[BODY].SetTranslation(trans);
-	}
 
 	//各パーツの更新
 	Calc();
@@ -166,8 +122,21 @@ void Enemy::Update()
 	m_CollisionNodeEnemy.Update();
 
 	//	プレイヤーへの追尾
-	//	先読み型のホーミング
-	PrefetchHoming();
+	if (m_homingFlag == true)
+	{
+		//	先読み型のホーミング
+		//PrefetchHoming();
+
+		//間合い確保型の自動追尾
+		//IntervalHoming();
+
+		//	待ち伏せ型の自動追尾
+		//AmbushHoming();
+
+		this->HomingExecute();
+	}
+
+	
 }
 
 //行列更新
@@ -205,42 +174,6 @@ void Enemy::Action()
 		Vector3 r_angle = m_ObjEnemy[R_ENGINE].GetRotation();
 		m_ObjEnemy[R_ENGINE].SetRotation(r_angle + Vector3(0, 0, 0.05f));
 
-		if (m_weapon_flag == true)
-		{
-			if (m_ObjEnemy[L_WEAPON].GetParent() != nullptr && m_ObjEnemy[R_WEAPON].GetParent() != nullptr)
-			{
-				Vector3 a =
-					m_ObjEnemy[L_WEAPON].GetParent()->GetParent()->GetTranslation()
-					+ m_ObjEnemy[L_WEAPON].GetParent()->GetTranslation()
-					+ m_ObjEnemy[L_WEAPON].GetTranslation();
-
-				Vector3 b =
-					m_ObjEnemy[R_WEAPON].GetParent()->GetParent()->GetTranslation()
-					+ m_ObjEnemy[R_WEAPON].GetParent()->GetTranslation()
-					+ m_ObjEnemy[R_WEAPON].GetTranslation();
-
-				Vector3 l_angle =
-					m_ObjEnemy[L_WEAPON].GetParent()->GetParent()->GetRotation()
-					+ m_ObjEnemy[L_WEAPON].GetParent()->GetRotation()
-					+ m_ObjEnemy[L_WEAPON].GetRotation();
-
-				Vector3 r_angle =
-					m_ObjEnemy[R_WEAPON].GetParent()->GetParent()->GetRotation()
-					+ m_ObjEnemy[R_WEAPON].GetParent()->GetRotation()
-					+ m_ObjEnemy[R_WEAPON].GetRotation();
-
-				m_ObjEnemy[L_WEAPON].SetRotation(l_angle);
-				m_ObjEnemy[R_WEAPON].SetRotation(r_angle);
-
-				m_a_flag = true;
-
-				m_ObjEnemy[L_WEAPON].SetTranslation(a += Vector3(0, 0, -0.075f));
-				m_ObjEnemy[R_WEAPON].SetTranslation(b += Vector3(0, 0, -0.075f));
-
-				m_ObjEnemy[L_WEAPON].SetParent(nullptr);
-				m_ObjEnemy[R_WEAPON].SetParent(nullptr);
-			}
-		}
 	}
 	//移動ベクトル（Z座標）
 	m_moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
@@ -249,52 +182,11 @@ void Enemy::Action()
 	//m_moveV = Vector3::TransformNormal(m_moveV, m_ObjEnemy[BODY].GetWorld());
 }
 
-//エネミーの角度を取得する
-const DirectX::SimpleMath::Vector3& Enemy::GetRot()
-{
-	return m_ObjEnemy[BODY].GetRotation();
-}
-
-//エネミーの位置を取得する
-const DirectX::SimpleMath::Vector3& Enemy::GetTrans()
-{
-	return m_ObjEnemy[BODY].GetTranslation();
-}
-
-//エネミーの移動ベクトルを取得する
-const DirectX::SimpleMath::Vector3 & Enemy::GetMoveV()
-{
-	return m_moveV;
-}
-
-//エネミーの角度をセットする
-void Enemy::SetRot(const Vector3& rotation)
-{
-	m_ObjEnemy[BODY].SetRotation(rotation);
-}
-
-//エネミーの角度をセットする(クォータニオン)
-void Enemy::SetRotQ(const DirectX::SimpleMath::Quaternion & rotationQ)
-{
-	m_ObjEnemy[BODY].SetRotationQ(rotationQ);
-}
-
-//エネミーの位置をセットする
-void Enemy::SetTrans(const Vector3& translation)
-{
-	m_ObjEnemy[BODY].SetTranslation(translation);
-}
-
 //追尾ホーミング
 
 //	先読み型の自動追尾
 void Enemy::PrefetchHoming()
 {
-	////	敵とプレイヤー座標の差
-	//Vector3 differencePos = m_Player->GetTrans() - GetTrans();
-
-	////	移動ベクトルの差
-	//Vector3 differenceVec = m_Player->GetMoveV() - GetMoveV();
 
 	//	相対距離
 	Vector3 dis;
@@ -326,13 +218,17 @@ void Enemy::PrefetchHoming()
 	pos = pos - GetTrans();
 
 	//	プレイヤーの方向への移動ベクトルの回転？
-	Vector3 EnemyRot = Vector3(0.0f, pos.y, 0.0f);
-	SetRot(EnemyRot);
+	//Vector3 EnemyRot = Vector3(0.0f, pos.y, 0.0f);
+	//SetRot(EnemyRot);
 
 	pos = pos * this->GetMoveV();
 
 	//	敵に反映させる
 	this->SetTrans(this->GetTrans() - pos);
+
+	pos.Normalize();
+	float angle = atan2f(pos.x, pos.z);
+	SetRot(Vector3(0.0f, angle + XM_2PI, 0.0f));
 }
 
 //	待ち伏せ型の自動追尾
@@ -358,7 +254,9 @@ void Enemy::AmbushHoming()
 		Vector3 pos = this->GetTrans();
 		this->SetTrans(pos + TurnVec);
 
-		this->SetRot(m_Player->GetRot());
+		float angle = atan2f(TurnVec.x, TurnVec.z);
+		SetRot(Vector3(0.0f, angle + XM_PI, 0.0f));
+
 	}
 }
 
@@ -378,3 +276,42 @@ void Enemy::IntervalHoming()
 	Vector3 pos = this->GetTrans();
 	this->SetTrans(pos + TurnVec);
 }
+
+//	ホーミングのフラグをセットする
+void Enemy::SetHomingFlag(bool flag)
+{
+	m_homingFlag = flag;
+}
+
+//	dictionaryに追加を行う関数
+void Enemy::addStrategy(Homing::Type type)
+{
+
+	switch (type) {
+	case Homing::PREFETCH:
+		m_homingDictionary[type] = new Prefetch();
+		break;
+
+	case Homing::INTERVAL:
+		m_homingDictionary[type] = new Interval();
+		break;
+
+	case Homing::AMBUSH:
+		m_homingDictionary[type] = new Ambush();
+		break;
+
+	case Homing::PURSUIT:
+		m_homingDictionary[type] = new Pursuit();
+		break;
+
+	default:
+		break;
+	}
+}
+
+//	実行する
+void Enemy::HomingExecute()
+{
+	m_homingDictionary[m_currentType]->homing(*m_Player, *this);
+}
+

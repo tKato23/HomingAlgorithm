@@ -107,6 +107,7 @@ private:
 
 	//キーボード
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
+	DirectX::Keyboard::KeyboardStateTracker m_tracker;
 
 	////地形データのポインタ配列
 	//std::vector<LandShape*> m_landShapeArray;

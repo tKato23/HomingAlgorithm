@@ -157,6 +157,9 @@ void Game::Update(DX::StepTimer const& timer)
 	//キーボードの更新
 	Keyboard::State keystate = m_keyboard->GetState();
 
+	auto state = m_keyboard->GetState();
+	m_tracker.Update(state);
+
 	// キーボードの更新
 	//Keyboard::State g_key = keyboard->GetState();
 
@@ -260,8 +263,69 @@ void Game::Update(DX::StepTimer const& timer)
 	//ModelEffectManager::getInstance()->Update();
 
 	//	デバッグ表示
-	m_debugText->AddText(Vector2(0, 10), L"%f", m_Enemy->GetTrans().x);
+	//m_debugText->AddText(Vector2(0, 10), L"%f", m_Enemy->GetTrans().x);
+	m_debugText->AddText(Vector2(0, 10), L"Reset:R Key");
+	m_debugText->AddText(Vector2(0, 30), L"HomingStart:Space Key");
 
+	//	現在のホーミングタイプを表示する
+	if (m_Enemy->getCurrentType() == Homing::Type::PREFETCH)
+	{
+		m_debugText->AddText(Vector2(0, 50), L"PREFETCH");
+	}
+	else if (m_Enemy->getCurrentType() == Homing::Type::INTERVAL)
+	{
+		m_debugText->AddText(Vector2(0, 50), L"INTERVAL");
+	}
+	else if (m_Enemy->getCurrentType() == Homing::Type::AMBUSH)
+	{
+		m_debugText->AddText(Vector2(0, 50), L"AMBUSH");
+	}
+	else
+	{
+		m_debugText->AddText(Vector2(0, 50), L"PURSUIT");
+	}
+	
+
+	//	Rキーが押されたらリセットを行う
+	if (m_tracker.IsKeyPressed(Keyboard::Keys::R))
+	{
+		//	初期位置へ移動する
+		m_Player->SetTrans(Vector3(0.0f, 10.0f, 0.0f));
+		m_Player->SetRot(Vector3::Zero);
+		m_Enemy->SetTrans(Vector3(-20.0f, 0.0f, -20.0f));
+		m_Enemy->SetRot(Vector3::Zero);
+
+		//	ホーミングのフラグをオフにする
+		m_Enemy->SetHomingFlag(false);
+	}
+
+	//	スペースキーが押されたらホーミングを開始する
+	if (m_tracker.IsKeyPressed(Keyboard::Keys::Space))
+	{
+		//	ホーミングをオンにする
+		m_Enemy->SetHomingFlag(true);
+	}
+
+	//	1キー押されたら先読み型ホーミングに切り替える
+	if (m_tracker.IsKeyPressed(Keyboard::Keys::D1))
+	{
+		m_Enemy->SetHomingType(Homing::Type::PREFETCH);
+	}
+	//	2キーが押されたら間合い型ホーミングに切り替える
+	if (m_tracker.IsKeyPressed(Keyboard::Keys::D2))
+	{
+		m_Enemy->SetHomingType(Homing::Type::INTERVAL);
+	}
+	//	3キーが押されたら待ち伏せ型ホーミングに切り替える
+	if (m_tracker.IsKeyPressed(Keyboard::Keys::D3))
+	{
+		m_Enemy->SetHomingType(Homing::Type::AMBUSH);
+	}
+	//	4キーが押されたら追跡型ホーミングに切り替える
+	if (m_tracker.IsKeyPressed(Keyboard::Keys::D4))
+	{
+		m_Enemy->SetHomingType(Homing::Type::PURSUIT);
+	}
 }
 
 // Draws the scene.

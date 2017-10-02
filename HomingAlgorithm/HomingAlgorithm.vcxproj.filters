@@ -14,6 +14,9 @@
     <Filter Include="Object">
       <UniqueIdentifier>{9c24f439-2c0f-43b5-b2d1-d12fa1280819}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Strategy">
+      <UniqueIdentifier>{524153b5-7908-4619-911d-a424037147d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -41,6 +44,9 @@
     <ClInclude Include="Player.h">
       <Filter>Object</Filter>
     </ClInclude>
+    <ClInclude Include="Strategy.h">
+      <Filter>Strategy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -67,6 +73,9 @@
     </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Strategy.cpp">
+      <Filter>Strategy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
