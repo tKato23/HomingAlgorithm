@@ -50,8 +50,8 @@ void Prefetch::homing(Player& player, Enemy& enemy)
 	pos = pos - enemy.GetTrans();
 
 	//	プレイヤーの方向への移動ベクトルの回転？
-	Vector3 EnemyRot = Vector3(0.0f, pos.y, 0.0f);
-	enemy.SetRot(EnemyRot);
+	//Vector3 EnemyRot = Vector3(0.0f, pos.y, 0.0f);
+	//enemy.SetRot(EnemyRot);
 
 	pos = pos * moveV;
 
@@ -108,17 +108,45 @@ void Ambush::homing(Player& player, Enemy& enemy)
 //	追跡型ホーミング
 void Pursuit::homing(Player& player, Enemy& enemy)
 {
-		//移動ベクトル(速度)
-		Vector3 moveV = Vector3(0.07f, 0.07f, 0.07f);
+
+	//移動ベクトル(速度)
+	Vector3 moveV = Vector3(0.07f, 0.07f, 0.07f);
 	
-		//プレイヤーへの向き
-		Vector3 direction = player.GetTrans() - enemy.GetTrans();
-		//正規化
-		direction.Normalize();
+	//プレイヤーへの向き
+	Vector3 direction = player.GetTrans() - enemy.GetTrans();
+	//正規化
+	direction.Normalize();
+
+	//	敵の前方向ベクトルとプレイヤーへのベクトルとの内積
+	Vector3 front = Vector3(0.0f, 0.0f, -1.0f);
+	front = Vector3::TransformNormal(front, enemy.GetWorld());
+	float dotvec = front.Dot(direction);
+
+	float angle = dotvec;
+	if (dotvec > -1.0f && dotvec < 1.0f)
+	{
+
+		angle = acosf(dotvec);
+	}
+	else
+	{
+		angle = 0.0f;
+	}
+
+	//	radianからdegreeへ
+	angle = XMConvertToDegrees(angle);
+
+	//	視点となる範囲
+	if (angle < 45.0f && angle > -45.0f)
+	{
+
 		//速度ベクトル
 		direction = direction * moveV;
 		//座標を移動させる
 		Vector3 pos = enemy.GetTrans();
 		enemy.SetTrans(pos + direction);
-		enemy.SetRot(player.GetRot());
+
+		float rot = atan2f(direction.x, direction.z);
+		enemy.SetRot(Vector3(0.0f, rot + XM_PI, 0.0f));
+	}
 }
