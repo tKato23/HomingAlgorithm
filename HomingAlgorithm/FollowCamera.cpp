@@ -49,26 +49,26 @@ void FollowCamera::Update()
 	//TPSカメラ
 	if (m_isFPS == false)
 	{
-		Vector3 refvec = Vector3(0, 2, 0);
+		Vector3 refvec = Vector3(-5.0f, 3.0f, 2.0f);
 
-		refvec = Vector3::TransformNormal(refvec, m_targetWorld);
+		//refvec = Vector3::TransformNormal(refvec, m_targetWorld);
 
 		refpos = m_target_pos + refvec;
 
 		// 参照点と視点の差分ベクトル
-		Vector3 cameraV(0, 20, CAMERA_DISTANCE);
+		Vector3 cameraV(5.0f, 10.0f, 10.0f);
 
 		// 差分ベクトルを回転させる
-		cameraV = Vector3::TransformNormal(cameraV, m_targetWorld);
+		//cameraV = Vector3::TransformNormal(cameraV, m_targetWorld);
 
 		// 視点座標を計算
 		eyepos = refpos + cameraV;
 
-		// 視点を現在位置から補間する
-		eyepos = m_eyepos + (eyepos - m_eyepos) * 0.05f;
+		//// 視点を現在位置から補間する
+		//eyepos = m_eyepos + (eyepos - m_eyepos) * 0.05f;
 
-		// 参照点を現在位置から補間する
-		refpos = m_refpos + (refpos - m_refpos) * 0.2f;
+		//// 参照点を現在位置から補間する
+		//refpos = m_refpos + (refpos - m_refpos) * 0.2f;
 	}
 
 	////FPSカメラ

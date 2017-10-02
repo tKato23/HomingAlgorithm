@@ -263,7 +263,6 @@ void Game::Update(DX::StepTimer const& timer)
 	//ModelEffectManager::getInstance()->Update();
 
 	//	デバッグ表示
-	//m_debugText->AddText(Vector2(0, 10), L"%f", m_Enemy->GetTrans().x);
 	m_debugText->AddText(Vector2(0, 10), L"Reset:R Key");
 	m_debugText->AddText(Vector2(0, 30), L"HomingStart:Space Key");
 

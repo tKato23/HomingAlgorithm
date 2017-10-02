@@ -54,13 +54,14 @@ public:
 	//エネミーの位置をセットする
 	void SetTrans(const DirectX::SimpleMath::Vector3& translation) { m_ObjEnemy[BODY].SetTranslation(translation); }
 
+	//プレイヤーをセットする
 	void SetPlayer(Player* player) { m_Player = player; }
+
+	//追跡型の自動追尾
+	void PursuitHouming();
 
 	//先読み型の自動追尾
 	void PrefetchHoming();
-
-	//間合い確保型の自動追尾
-	void IntervalHoming();
 
 	//	待ち伏せ型の自動追尾
 	void AmbushHoming();
@@ -76,6 +77,9 @@ public:
 	void addStrategy(Homing::Type type);
 	void HomingExecute();
 
+	//間合い確保型の自動追尾
+	void IntervalHoming();
+
 private:
 
 	//自機の3Dオブジェクト
@@ -85,6 +89,7 @@ private:
 	Player* m_Player;
 
 	//	定数
+
 	static const float MOVE_SPEED;
 	static const int MAX_STRATEGY_NUM = 4;
 

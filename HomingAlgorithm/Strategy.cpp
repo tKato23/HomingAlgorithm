@@ -18,6 +18,8 @@ using namespace DirectX::SimpleMath;
 //	先読み型ホーミング
 void Prefetch::homing(Player& player, Enemy& enemy)
 {
+	Vector3 moveV = Vector3(0.02f, 0.02f, 0.02f);
+
 	//	相対距離
 	Vector3 dis;
 	dis.x = player.GetTrans().x - enemy.GetTrans().x;
@@ -26,9 +28,9 @@ void Prefetch::homing(Player& player, Enemy& enemy)
 
 	//	相対速度
 	Vector3 vel;
-	vel.x = player.GetMoveV().x - enemy.GetMoveV().x;
-	vel.y = player.GetMoveV().y - enemy.GetMoveV().y;
-	vel.z = player.GetMoveV().z - enemy.GetMoveV().z;
+	vel.x = player.GetMoveV().x - moveV.x;
+	vel.y = player.GetMoveV().y - moveV.y;
+	vel.z = player.GetMoveV().z - moveV.z;
 
 	//	接近時間　
 	float time = 0.0f;
@@ -51,10 +53,10 @@ void Prefetch::homing(Player& player, Enemy& enemy)
 	Vector3 EnemyRot = Vector3(0.0f, pos.y, 0.0f);
 	enemy.SetRot(EnemyRot);
 
-	pos = pos * enemy.GetMoveV();
+	pos = pos * moveV;
 
 	//	敵に反映させる
-	enemy.SetTrans(enemy.GetTrans() - pos);
+	enemy.SetTrans(enemy.GetTrans() + pos);
 }
 
 //	間合い確保型ホーミング
@@ -106,5 +108,17 @@ void Ambush::homing(Player& player, Enemy& enemy)
 //	追跡型ホーミング
 void Pursuit::homing(Player& player, Enemy& enemy)
 {
-
+		//移動ベクトル(速度)
+		Vector3 moveV = Vector3(0.07f, 0.07f, 0.07f);
+	
+		//プレイヤーへの向き
+		Vector3 direction = player.GetTrans() - enemy.GetTrans();
+		//正規化
+		direction.Normalize();
+		//速度ベクトル
+		direction = direction * moveV;
+		//座標を移動させる
+		Vector3 pos = enemy.GetTrans();
+		enemy.SetTrans(pos + direction);
+		enemy.SetRot(player.GetRot());
 }

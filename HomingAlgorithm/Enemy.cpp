@@ -14,9 +14,6 @@ Enemy::Enemy()
 	m_Player = nullptr;
 
 	Initialize();
-
-	//	初期化処理
-	m_Player = nullptr;
 }
 
 //デストラクタ
@@ -40,38 +37,23 @@ void Enemy::Initialize()
 
 	//パーツを親子関係をセット
 	m_ObjEnemy[L_WING].SetParent(&m_ObjEnemy[BODY]);
-
 	m_ObjEnemy[R_WING].SetParent(&m_ObjEnemy[BODY]);
-
 	m_ObjEnemy[L_ENGINE].SetParent(&m_ObjEnemy[BODY]);
-
 	m_ObjEnemy[R_ENGINE].SetParent(&m_ObjEnemy[BODY]);
-
 	m_ObjEnemy[L_WEAPON].SetParent(&m_ObjEnemy[L_WING]);
-
 	m_ObjEnemy[R_WEAPON].SetParent(&m_ObjEnemy[R_WING]);
 
 	//親からのオフセット(座標のずらし分)をセット
 	m_ObjEnemy[BODY].SetTranslation(Vector3(0.0f, 2.0f, 0.0f));
-
 	m_ObjEnemy[L_WING].SetTranslation(Vector3(0.0f, 0.0f, 0.0f));
-
 	m_ObjEnemy[R_WING].SetTranslation(Vector3(0.0f, 0.0f, 0.0f));
-
 	m_ObjEnemy[L_ENGINE].SetTranslation(Vector3(-0.1f, 0.0f, 0.5f));
-
 	m_ObjEnemy[L_ENGINE].SetScale(Vector3(0.75f, 0.75f, 0.75f));
-
 	m_ObjEnemy[R_ENGINE].SetTranslation(Vector3(0.1f, 0.0f, 0.5f));
-
 	m_ObjEnemy[R_ENGINE].SetScale(Vector3(0.75f, 0.75f, 0.75f));
-
 	m_ObjEnemy[L_WEAPON].SetTranslation(Vector3(-0.5f, -0.05f, -0.025f));
-
 	m_ObjEnemy[L_WEAPON].SetScale(Vector3(0.75f, 0.75f, 0.6f));
-
 	m_ObjEnemy[R_WEAPON].SetTranslation(Vector3(0.5f, -0.05f, -0.025f));
-
 	m_ObjEnemy[R_WEAPON].SetScale(Vector3(0.75f, 0.75f, 0.6f));
 
 	//タイマーの初期化
@@ -106,6 +88,7 @@ void Enemy::Initialize()
 
 	//	初期化として先読み型をセット
 	this->SetHomingType(Homing::Type::PREFETCH);
+
 }
 
 //更新処理
@@ -137,6 +120,13 @@ void Enemy::Update()
 	}
 
 	
+	//IntervalHoming();
+
+	//各パーツの更新
+	Calc();
+
+	//当たり判定の更新
+	m_CollisionNodeEnemy.Update();
 }
 
 //行列更新
@@ -175,107 +165,124 @@ void Enemy::Action()
 		m_ObjEnemy[R_ENGINE].SetRotation(r_angle + Vector3(0, 0, 0.05f));
 
 	}
-	//移動ベクトル（Z座標）
-	m_moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
-
 	//移動量ベクトルを自機の角度分回転させる
 	//m_moveV = Vector3::TransformNormal(m_moveV, m_ObjEnemy[BODY].GetWorld());
 }
 
-//追尾ホーミング
-
-//	先読み型の自動追尾
-void Enemy::PrefetchHoming()
-{
-
-	//	相対距離
-	Vector3 dis;
-	dis.x = m_Player->GetTrans().x - GetTrans().x;
-	dis.y = m_Player->GetTrans().y - GetTrans().y;
-	dis.z = m_Player->GetTrans().z - GetTrans().z;
-
-	//	相対速度
-	Vector3 vel;
-	vel.x = m_Player->GetMoveV().x - GetMoveV().x;
-	vel.y = m_Player->GetMoveV().y - GetMoveV().y;
-	vel.z = m_Player->GetMoveV().z - GetMoveV().z;
-
-	//	接近時間　
-	float time = 0.0f;
-	float distance = sqrtf(dis.x * dis.x + dis.y * dis.y + dis.z * dis.z);
-	float velocity = sqrtf(vel.x * vel.x + vel.y * vel.y + vel.z * vel.z);
-
-	time = distance / velocity;
-	time = fabsf(time);
-
-	//	予測地点
-	Vector3 pos;
-	pos.x = m_Player->GetTrans().x + (m_Player->GetMoveV().x * time);
-	pos.y = m_Player->GetTrans().y + (m_Player->GetMoveV().y * time);
-	pos.z = m_Player->GetTrans().z + (m_Player->GetMoveV().z * time);
-
-	//	ベクトル
-	pos = pos - GetTrans();
-
-	//	プレイヤーの方向への移動ベクトルの回転？
-	//Vector3 EnemyRot = Vector3(0.0f, pos.y, 0.0f);
-	//SetRot(EnemyRot);
-
-	pos = pos * this->GetMoveV();
-
-	//	敵に反映させる
-	this->SetTrans(this->GetTrans() - pos);
-
-	pos.Normalize();
-	float angle = atan2f(pos.x, pos.z);
-	SetRot(Vector3(0.0f, angle + XM_2PI, 0.0f));
-}
-
-//	待ち伏せ型の自動追尾
-void Enemy::AmbushHoming()
-{
-	//移動ベクトル(速度)
-	m_moveV = Vector3(0.07f, 0.07f, 0.07f);
-
-	//追尾対象(プレイヤー)へのベクトル
-	Vector3 TurnVec = m_Player->GetTrans() - this->GetTrans();
-
-	//	一定距離以内なら追尾を行う
-	if (TurnVec.x < 10.0f &&  TurnVec.x > -10.0f && TurnVec.y <= 10.0f 
-		&& TurnVec.y > -10.0f && TurnVec.z < 10.0f && TurnVec.z > -10.0f)
-	{
-		//ベクトルの正規化
-		TurnVec.Normalize();
-
-		//追尾対象へのベクトルに移動ベクトルを乗算する
-		TurnVec = TurnVec * m_moveV;
-
-		//座標を移動させる
-		Vector3 pos = this->GetTrans();
-		this->SetTrans(pos + TurnVec);
-
-		float angle = atan2f(TurnVec.x, TurnVec.z);
-		SetRot(Vector3(0.0f, angle + XM_PI, 0.0f));
-
-	}
-}
-
-//間合い確保型の自動追尾
-void Enemy::IntervalHoming()
-{
-	//追尾対象(プレイヤー)へのベクトル
-	Vector3 TurnVec = m_Player->GetTrans() - this->GetTrans();
-
-	//ベクトルの正規化
-	TurnVec.Normalize();
-
-	//追尾対象へのベクトルに移動ベクトルを乗算する
-	TurnVec = TurnVec * m_moveV;
-
-	//座標を移動させる
-	Vector3 pos = this->GetTrans();
-	this->SetTrans(pos + TurnVec);
-}
+////追跡型の自動追尾
+//void Enemy::PursuitHouming()
+//{
+//	//移動ベクトル(速度)
+//	m_moveV = Vector3(0.07f, 0.07f, 0.07f);
+//
+//	//プレイヤーへの向き
+//	Vector3 direction = m_Player->GetTrans() - this->GetTrans();
+//	//正規化
+//	direction.Normalize();
+//	//速度ベクトル
+//	direction = direction*m_moveV;
+//	//座標を移動させる
+//	Vector3 pos = this->GetTrans();
+//	this->SetTrans(pos + direction);
+//	this->SetRot(m_Player->GetRot());
+//}
+//
+////	先読み型の自動追尾
+//void Enemy::PrefetchHoming()
+//{
+//	//	相対距離
+//	Vector3 dis;
+//	dis.x = m_Player->GetTrans().x - GetTrans().x;
+//	dis.y = m_Player->GetTrans().y - GetTrans().y;
+//	dis.z = m_Player->GetTrans().z - GetTrans().z;
+//
+//	//	相対速度
+//	Vector3 vel;
+//	vel.x = m_Player->GetMoveV().x - GetMoveV().x;
+//	vel.y = m_Player->GetMoveV().y - GetMoveV().y;
+//	vel.z = m_Player->GetMoveV().z - GetMoveV().z;
+//
+//	//	接近時間　
+//	float time = 0.0f;
+//	float distance = sqrtf(dis.x * dis.x + dis.y * dis.y + dis.z * dis.z);
+//	float velocity = sqrtf(vel.x * vel.x + vel.y * vel.y + vel.z * vel.z);
+//
+//	//float angle = m_ObjEnemy[BODY].GetRotation().y;
+//
+//	//移動量ベクトルを自機の角度分回転させる
+//	//m_moveV = Vector3::TransformNormal(m_moveV, m_ObjEnemy[BODY].GetWorld());
+//
+//	//	プレイヤーの方向への移動ベクトルの回転？
+//	//Vector3 EnemyRot = Vector3(0.0f, pos.y, 0.0f);
+//	//SetRot(EnemyRot);
+//
+//
+//	//移動ベクトル(速度)
+//	m_moveV = Vector3(0.07f, 0.07f, 0.07f);
+//
+//	//	敵に反映させる
+//	this->SetTrans(this->GetTrans() - pos);
+//
+//	pos.Normalize();
+//	float angle = atan2f(pos.x, pos.z);
+//	SetRot(Vector3(0.0f, angle + XM_2PI, 0.0f));
+//
+//}
+//
+//
+////待ち伏せ型の自動追尾
+//void Enemy::AmbushHoming()
+//{
+//	//追尾対象(プレイヤー)へのベクトル
+//	Vector3 TurnVec = m_Player->GetTrans() - this->GetTrans();
+//
+//	//	一定距離以内なら追尾を行う
+//	if (TurnVec.x < 10.0f &&  TurnVec.x > -10.0f && TurnVec.y <= 10.0f 
+//		&& TurnVec.y > -10.0f && TurnVec.z < 10.0f && TurnVec.z > -10.0f)
+//	{
+//		//ベクトルの正規化
+//		TurnVec.Normalize();
+//
+//		//追尾対象へのベクトルに移動ベクトルを乗算する
+//		TurnVec = TurnVec * m_moveV;
+//
+//		//座標を移動させる
+//		Vector3 pos = this->GetTrans();
+//		this->SetTrans(pos + TurnVec);
+//
+//		float angle = atan2f(TurnVec.x, TurnVec.z);
+//		SetRot(Vector3(0.0f, angle + XM_PI, 0.0f));
+//
+//	}
+//}
+//
+////間合い確保型の自動追尾
+//void Enemy::IntervalHoming()
+//{
+//	//移動ベクトル
+//	m_moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
+//
+//	//追尾対象(プレイヤー)へのベクトル
+//	Vector3 Vec = m_Player->GetTrans() - this->GetTrans();
+//
+//	float angle_X = atan2f(Vec.z, Vec.y);
+//	float angle_Y = atan2f(Vec.x, Vec.z);
+//	float angle_Z = atan2f(Vec.y, Vec.x);
+//
+//	this->SetRot(Vector3(angle_X + XM_PI, angle_Y + XM_PI, 0.0f));
+//	//this->SetRot(Vector3(0.0f, angle_Y, 0.0f));
+//
+//	//ベクトルの正規化
+//	Vec.Normalize();
+//
+//	//追尾対象へのベクトルに移動ベクトルを乗算する
+//	Vec = Vec * m_moveV;
+//
+//	//座標を移動させる
+//	Vector3 pos = this->GetTrans();
+//
+//	this->SetTrans(pos + TurnVec);
+//}
 
 //	ホーミングのフラグをセットする
 void Enemy::SetHomingFlag(bool flag)
