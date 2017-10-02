@@ -283,6 +283,8 @@ void Game::Update(DX::StepTimer const& timer)
 	{
 		m_debugText->AddText(Vector2(0, 50), L"PURSUIT");
 	}
+
+	m_debugText->AddText(Vector2(0, 70), L"%f", m_Enemy->GetRot().y);
 	
 
 	//	Rキーが押されたらリセットを行う
