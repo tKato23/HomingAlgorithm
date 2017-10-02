@@ -45,6 +45,9 @@ public:
 	//エネミーの当たり判定を取得する
 	const SphereNode& GetCollisionNodeEnemy() { return m_CollisionNodeEnemy; }
 
+	//	エネミーのワールド座標
+	const DirectX::SimpleMath::Matrix& GetWorld() { return m_ObjEnemy[BODY].GetWorld(); }
+
 	//エネミーの角度をセットする
 	void SetRot(const DirectX::SimpleMath::Vector3& rotation) { m_ObjEnemy[BODY].SetRotation(rotation); }
 
@@ -53,6 +56,9 @@ public:
 
 	//エネミーの位置をセットする
 	void SetTrans(const DirectX::SimpleMath::Vector3& translation) { m_ObjEnemy[BODY].SetTranslation(translation); }
+
+	//	エネミーのワールド行列をセットする
+	void SetWorld(const DirectX::SimpleMath::Matrix& world) { m_ObjEnemy[BODY].SetWorld(world); }
 
 	//プレイヤーをセットする
 	void SetPlayer(Player* player) { m_Player = player; }

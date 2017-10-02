@@ -87,7 +87,7 @@ void Enemy::Initialize()
 	}
 
 	//	‰Šú‰»‚Æ‚µ‚Äæ“Ç‚ÝŒ^‚ðƒZƒbƒg
-	this->SetHomingType(Homing::Type::PREFETCH);
+	this->SetHomingType(Homing::Type::PURSUIT);
 
 }
 

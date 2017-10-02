@@ -64,7 +64,7 @@ void Game::Initialize(HWND window, int width, int height)
 	// プレイヤーの生成
 	m_Player = std::make_unique<Player>(m_keyboard.get());
 	m_Player->Initialize();
-	m_Player->SetTrans(Vector3(0.0f, 10.0f, 0.0f));
+	m_Player->SetTrans(Vector3(0.0f, 0.0f, 0.0f));
 
 	//	エネミーの生成
 	m_Enemy = std::make_unique<Enemy>();
@@ -283,6 +283,8 @@ void Game::Update(DX::StepTimer const& timer)
 	{
 		m_debugText->AddText(Vector2(0, 50), L"PURSUIT");
 	}
+
+	m_debugText->AddText(Vector2(0, 70), L"%f", m_Enemy->GetRot().y);
 	
 
 	//	Rキーが押されたらリセットを行う
