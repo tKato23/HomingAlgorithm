@@ -2,7 +2,6 @@
 
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include <vector>
 #include "Obj3d.h"
 #include "CollisionNode.h"
 #include "Player.h"
@@ -10,9 +9,12 @@
 class Enemy
 {
 public:
+	//コンストラクタ
 	Enemy();
 
+	//デストラクタ
 	~Enemy();
+
 	//初期化処理
 	void Initialize();
 
@@ -27,6 +29,12 @@ public:
 
 	//エネミーの挙動
 	void Action();
+
+	//ミサイルを発射する関数
+	void FireWeapon();
+
+	//ミサイルを再装着する関数
+	void ResetWeapon();
 
 	//エネミーの角度を取得する
 	const DirectX::SimpleMath::Vector3& GetRot() { return m_ObjEnemy[BODY].GetRotation(); };
@@ -61,39 +69,34 @@ public:
 	//先読み型の自動追尾
 	void PrefetchHoming();
 
-	//	待ち伏せ型の自動追尾
+	//待ち伏せ型の自動追尾
 	void AmbushHoming();
 
 	//間合い確保型の自動追尾
 	void IntervalHoming();
 
 private:
+	//定数宣言
+	const float MOVE_SPEED = 0.1f;
+	const float INTERVAL_SPACE = 2.5f;
 
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjEnemy;
 
-
-	//	プレイヤー
+	//プレイヤー
 	Player* m_Player;
-
-	//	定数
-	const float MOVE_SPEED = 0.08f;
-
-	// サイン用の引数となる角度
-	float m_sinAngle;
 
 	//タイマー
 	int m_Timer;
 
-	//移動ベクトル
-	DirectX::SimpleMath::Vector3 m_moveV;
-
-	//目標角度
-	float m_DistAngle;
-
 	//ミサイル攻撃を管理するフラグ
 	bool m_weapon_flag;
-	bool m_a_flag;
+
+	//ミサイルの速度ベクトル
+	DirectX::SimpleMath::Vector3 m_weapon_speed;
+
+	//移動ベクトル
+	DirectX::SimpleMath::Vector3 m_moveV;
 
 	//自機パーツ
 	enum ENEMYPARTS

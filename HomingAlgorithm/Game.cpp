@@ -64,12 +64,12 @@ void Game::Initialize(HWND window, int width, int height)
 	// プレイヤーの生成
 	m_Player = std::make_unique<Player>(m_keyboard.get());
 	m_Player->Initialize();
-	m_Player->SetTrans(Vector3(0.0f, 10.0f, 0.0f));
+	m_Player->SetTrans(Vector3(0.0f, 0.0f, 0.0f));
 
 	//	エネミーの生成
 	m_Enemy = std::make_unique<Enemy>();
 	m_Enemy->Initialize();
-	m_Enemy->SetTrans(Vector3(-20.0f, 0.0f, -20.0f));
+	m_Enemy->SetTrans(Vector3(10.0f, 0.0f, 10.0f));
 	m_Enemy->SetPlayer(m_Player.get());
 
 	//カメラにキーボードをセット
