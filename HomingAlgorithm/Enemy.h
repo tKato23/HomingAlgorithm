@@ -71,28 +71,19 @@ public:
 	//プレイヤーをセットする
 	void SetPlayer(Player* player) { m_Player = player; }
 
-	//追跡型の自動追尾
-	void PursuitHouming();
-
-	//先読み型の自動追尾
-	void PrefetchHoming();
-
-	//待ち伏せ型の自動追尾
-	void AmbushHoming();
-
 	//ホーミングのフラグをセットする
 	void SetHomingFlag(bool flag);
 
 	//タイプの取得とセット
 	Homing::Type getCurrentType() { return m_currentType; }
 	void SetHomingType(Homing::Type type) { m_currentType = type; }
-
+	
+	//	ホーミング辞書の取得
 	Homing** getHomingDictionary() { return m_homingDictionary; }
+	//	タイプの追加
 	void addStrategy(Homing::Type type);
+	//	実行する
 	void HomingExecute();
-
-	//間合い確保型の自動追尾
-	void IntervalHoming();
 
 private:
 	//定数宣言
@@ -136,6 +127,8 @@ private:
 	//	ホーミングを実行するフラグ
 	bool m_homingFlag;
 
+	//	各ホーミングの情報
 	Homing* m_homingDictionary[MAX_STRATEGY_NUM];
+	//	現在のタイプ
 	Homing::Type m_currentType;
 };

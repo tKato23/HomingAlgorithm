@@ -87,7 +87,7 @@ void Enemy::Initialize()
 	}
 
 	//	初期化として先読み型をセット
-	this->SetHomingType(Homing::Type::PURSUIT);
+	this->SetHomingType(Homing::Type::PREFETCH);
 }
 
 //更新処理
@@ -105,27 +105,13 @@ void Enemy::Update()
 	//	プレイヤーへの追尾
 	if (m_homingFlag == true)
 	{
-		//	先読み型のホーミング
-		//PrefetchHoming();
-
-		//間合い確保型の自動追尾
-		//IntervalHoming();
-
-		//	待ち伏せ型の自動追尾
-		//AmbushHoming();
-
 		this->HomingExecute();
 	}
 
 	m_Timer++;
 
-	IntervalHoming();
-
 	//各パーツの更新
 	Calc();
-
-	//当たり判定の更新
-	m_CollisionNodeEnemy.Update();
 }
 
 //行列更新
@@ -412,12 +398,6 @@ void Enemy::ResetWeapon()
 	m_weapon_flag = false;
 }
 
-//追跡型の自動追尾
-void Enemy::PursuitHouming()
-{
-	
-}
-
 //	dictionaryに追加を行う関数
 void Enemy::addStrategy(Homing::Type type)
 {
@@ -445,81 +425,8 @@ void Enemy::addStrategy(Homing::Type type)
 	}
 }
 
-//待ち伏せ型の自動追尾
-void Enemy::AmbushHoming()
-{
-	//追尾対象(プレイヤー)へのベクトル
-	Vector3 TurnVec = m_Player->GetTrans() - this->GetTrans();
-}
-
 //	実行する
 void Enemy::HomingExecute()
 {
 	m_homingDictionary[m_currentType]->homing(*m_Player, *this);
-}
-
-//間合い確保型の自動追尾
-void Enemy::IntervalHoming()
-{
-	////追尾対象(プレイヤー)へのベクトル
-	//Vector3 Vec = m_Player->GetTrans() - this->GetTrans();
-
-	//float distance_Square;
-
-	//distance_Square = Vec.x * Vec.x + Vec.y * Vec.y + Vec.z * Vec.z;
-
-	////半径の和の二乗
-	//float radius_Square;
-
-	//radius_Square = INTERVAL_SPACE + INTERVAL_SPACE;
-	//radius_Square = radius_Square * radius_Square;
-
-	////距離が半径の和より大きければ当たっていない
-	//if (distance_Square > radius_Square)
-	//{
-	//	//ベクトルの正規化
-	//	Vec.Normalize();
-
-	//	//移動ベクトル
-	//	m_moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
-
-	//	//追尾対象へのベクトルに移動ベクトルを乗算する
-	//	Vec = Vec * m_moveV;
-
-	//	//float angle_X = atan2f(Vec.z, Vec.y) - XM_PIDIV2;
-	//	float angle_Y = atan2f(Vec.x, Vec.z) + XM_PI;
-	//	//float angle_Z = atan2f(Vec.y, Vec.x);
-
-	//	this->SetRot(Vector3(0.0f, angle_Y, 0.0f));
-
-	//	//座標を移動させる
-	//	Vector3 pos = this->GetTrans();
-	//	this->SetTrans(pos + Vec);
-	//}
-	//else if(distance_Square + 1.0f < radius_Square)
-	//{
-	//	//ベクトルの正規化
-	//	Vec.Normalize();
-
-	//	//移動ベクトル
-	//	m_moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
-
-	//	//追尾対象へのベクトルに移動ベクトルを乗算する
-	//	Vec = Vec * m_moveV;
-
-	//	//float angle_X = atan2f(Vec.z, Vec.y) - XM_PIDIV2;
-	//	float angle_Y = atan2f(Vec.x, Vec.z) + XM_PI;
-	//	//float angle_Z = atan2f(Vec.y, Vec.x);
-
-	//	this->SetRot(Vector3(0.0f, angle_Y, 0.0f));
-
-	//	//座標を移動させる
-	//	Vector3 pos = this->GetTrans();
-	//	this->SetTrans(pos - Vec);
-	//}
-	//else if(distance_Square >= radius_Square || distance_Square <= radius_Square)
-	//{
-	//	//移動ベクトル
-	//	m_moveV = Vector3(0.0f, 0.0f, 0.0f);
-	//}
 }

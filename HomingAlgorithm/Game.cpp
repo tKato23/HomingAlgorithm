@@ -157,29 +157,29 @@ void Game::Update(DX::StepTimer const& timer)
 	m_objSkydome.Update();
 	m_objGround.Update();
 
+	//ModelEffectManager::getInstance()->Update();
+
 	//	デバッグ表示
-	m_debugText->AddText(Vector2(0, 10), L"Reset:R Key");
-	m_debugText->AddText(Vector2(0, 30), L"HomingStart:Space Key");
+	//m_debugText->AddText(Vector2(0, 10), L"Reset:R Key");
+	//m_debugText->AddText(Vector2(0, 30), L"HomingStart:Space Key");
 
 	//	現在のホーミングタイプを表示する
 	if (m_Enemy->getCurrentType() == Homing::Type::PREFETCH)
 	{
-		m_debugText->AddText(Vector2(0, 50), L"PREFETCH");
+		m_debugText->AddText(Vector2(0, 10), L"PREFETCH");
 	}
 	else if (m_Enemy->getCurrentType() == Homing::Type::INTERVAL)
 	{
-		m_debugText->AddText(Vector2(0, 50), L"INTERVAL");
+		m_debugText->AddText(Vector2(0, 10), L"INTERVAL");
 	}
 	else if (m_Enemy->getCurrentType() == Homing::Type::AMBUSH)
 	{
-		m_debugText->AddText(Vector2(0, 50), L"AMBUSH");
+		m_debugText->AddText(Vector2(0, 10), L"AMBUSH");
 	}
 	else
 	{
-		m_debugText->AddText(Vector2(0, 50), L"PURSUIT");
+		m_debugText->AddText(Vector2(0, 10), L"PURSUIT");
 	}
-
-	m_debugText->AddText(Vector2(0, 70), L"%f", m_Enemy->GetRot().y);
 	
 
 	//	Rキーが押されたらリセットを行う
