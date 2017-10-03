@@ -15,7 +15,6 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include "Player.h"
-//#include "Enemy.h"
 
 class Enemy;
 

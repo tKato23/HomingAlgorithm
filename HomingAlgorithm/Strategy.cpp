@@ -22,6 +22,7 @@ const float Interval::MOVE_SPEED = 0.07f;
 //	先読み型ホーミング
 void Prefetch::homing(Player& player, Enemy& enemy)
 {
+	//　移動ベクトル
 	Vector3 moveV = Vector3(0.02f, 0.02f, 0.02f);
 
 	//	相対距離
@@ -66,7 +67,7 @@ void Prefetch::homing(Player& player, Enemy& enemy)
 	enemy.SetTrans(enemy.GetTrans() + pos);
 }
 
-//	間合い確保型ホーミング
+//間合い確保型ホーミング
 void Interval::homing(Player& player, Enemy& enemy)
 {
 	//追尾対象(プレイヤー)へのベクトル
@@ -74,15 +75,16 @@ void Interval::homing(Player& player, Enemy& enemy)
 
 	float distance_Square;
 
+	//三平方の定理で、ベクトルの長さを計算する
 	distance_Square = Vec.x * Vec.x + Vec.y * Vec.y + Vec.z * Vec.z;
 
-	//半径の和の二乗
 	float radius_Square;
 
+	//半径の和の二乗
 	radius_Square = INTERVAL_SPACE + INTERVAL_SPACE;
 	radius_Square = radius_Square * radius_Square;
 
-	//距離が半径の和より大きければ当たっていない
+	//距離が半径の和より大きければ前進する
 	if (distance_Square > radius_Square)
 	{
 		//ベクトルの正規化
@@ -94,6 +96,7 @@ void Interval::homing(Player& player, Enemy& enemy)
 		//追尾対象へのベクトルに移動ベクトルを乗算する
 		Vec = Vec * moveV;
 
+		//角度の設定
 		float angle_Y = atan2f(Vec.x, Vec.z) + XM_PI;
 		enemy.SetRot(Vector3(0.0f, angle_Y, 0.0f));
 
@@ -101,6 +104,7 @@ void Interval::homing(Player& player, Enemy& enemy)
 		Vector3 pos = enemy.GetTrans();
 		enemy.SetTrans(pos + Vec);
 	}
+	//距離が半径の和より小さければ後退する
 	else if (distance_Square + 1.0f < radius_Square)
 	{
 		//ベクトルの正規化
@@ -112,6 +116,7 @@ void Interval::homing(Player& player, Enemy& enemy)
 		//追尾対象へのベクトルに移動ベクトルを乗算する
 		Vec = Vec * moveV;
 
+		//角度の設定
 		float angle_Y = atan2f(Vec.x, Vec.z) + XM_PI;
 		enemy.SetRot(Vector3(0.0f, angle_Y, 0.0f));
 
@@ -119,6 +124,7 @@ void Interval::homing(Player& player, Enemy& enemy)
 		Vector3 pos = enemy.GetTrans();
 		enemy.SetTrans(pos - Vec);
 	}
+	//前進、後退の繰り返しを避ける
 	else if (distance_Square >= radius_Square || distance_Square <= radius_Square)
 	{
 		//移動ベクトル

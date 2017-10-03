@@ -1,5 +1,8 @@
+
+//多重インクルードの防止
 #pragma once
 
+//ヘッダファイルのインクルード
 #include <d3d11.h>
 #include <Keyboard.h>
 #include "CollisionNode.h"
@@ -28,12 +31,6 @@ public:
 	//プレイヤーの挙動
 	void Action();
 
-	//ミサイルを発射する関数
-	void FireWeapon();
-
-	//ミサイルを再装着する関数
-	void ResetWeapon();
-
 	//プレイヤーの角度を取得する
 	const DirectX::SimpleMath::Vector3& GetRot() { return m_ObjPlayer[BODY].GetRotation(); }
 
@@ -60,7 +57,7 @@ public:
 
 private:
 	//定数宣言
-	const float ROT_SPEED = 0.05f;				//機体の回転速度
+	const float ROT_SPEED = 0.05f;	//機体の回転速度
 
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjPlayer;
@@ -68,12 +65,6 @@ private:
 	// キーボード
 	DirectX::Keyboard* m_pKeyboard;
 	DirectX::Keyboard::KeyboardStateTracker m_KeyboardTracker;
-
-	//ミサイル攻撃を管理するフラグ
-	bool m_weapon_flag;
-
-	//ミサイルの速度ベクトル
-	DirectX::SimpleMath::Vector3 m_weapon_speed;
 
 	//プレイヤーの移動ベクトル
 	DirectX::SimpleMath::Vector3 m_moveV;
@@ -86,8 +77,6 @@ private:
 		R_WING,
 		L_ENGINE,
 		R_ENGINE,
-		L_WEAPON,
-		R_WEAPON,
 
 		PLAYER_PARTS_NUM
 	};

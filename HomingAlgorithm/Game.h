@@ -7,25 +7,10 @@
 #include "StepTimer.h"
 #include <VertexTypes.h>
 #include <PrimitiveBatch.h>
-#include <Effects.h>
-#include <CommonStates.h>
-#include <SimpleMath.h>
-#include <Model.h>
 #include "FollowCamera.h"
 #include "DebugText.h"
-
-#include <SimpleMath.h>
-#include <vector>
-#include "Obj3d.h"
 #include "Player.h"
 #include "Enemy.h"
-
-//定数宣言
-const int Ball_Number = 20;
-const int Teapot_Number = 20;
-const int Max_Graund = 200;
-const int Enemy_Num = 5;
-const int Circle_Num = 15;
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -93,9 +78,6 @@ private:
 
 	std::unique_ptr<DebugText> m_debugText;
 
-	//エフェクトファクトリ
-	std::unique_ptr<DirectX::EffectFactory> m_factory;
-
 	//プレイヤー
 	std::unique_ptr<Player> m_Player;
 
@@ -105,9 +87,6 @@ private:
 	//キーボード
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 	DirectX::Keyboard::KeyboardStateTracker m_tracker;
-
-	//モデル(天球)
-	Obj3d m_objSkydome;
 
 	//モデル(地面)
 	Obj3d m_objGround;

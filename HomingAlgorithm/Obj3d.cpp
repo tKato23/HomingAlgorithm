@@ -1,3 +1,5 @@
+
+//ヘッダファイルのインクルード
 #include "Obj3d.h"
 
 using namespace DirectX;

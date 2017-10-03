@@ -5,7 +5,6 @@
 #include "pch.h"
 #include "Game.h"
 
-
 extern void ExitGame();
 
 using namespace DirectX;
@@ -51,15 +50,15 @@ void Game::Initialize(HWND window, int width, int height)
 	//3Dオブジェクトの静的メンバを初期化
 	Obj3d::InitializeStatic(m_d3dDevice, m_d3dContext, m_Camera.get());
 
-	// キーボードの初期化
+	//キーボードの初期化
 	m_keyboard = std::make_unique<Keyboard>();
 
-	// プレイヤーの生成
+	//プレイヤーの初期化
 	m_Player = std::make_unique<Player>(m_keyboard.get());
 	m_Player->Initialize();
 	m_Player->SetTrans(Vector3(0.0f, 0.0f, 0.0f));
 
-	//	エネミーの生成
+	//エネミーの初期化
 	m_Enemy = std::make_unique<Enemy>();
 	m_Enemy->Initialize();
 	m_Enemy->SetTrans(Vector3(-20.0f, 0.0f, -20.0f));
@@ -68,7 +67,7 @@ void Game::Initialize(HWND window, int width, int height)
 	//カメラにキーボードをセット
 	m_Camera->SetKeyboard(m_keyboard.get());
 
-	// カメラにプレイヤーをセット
+	//カメラにプレイヤーをセット
 	m_Camera->SetPlayer(m_Player.get());
 
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
@@ -96,15 +95,6 @@ void Game::Initialize(HWND window, int width, int height)
 		VertexPositionColor::InputElementCount,
 		shaderByteCode, byteCodeLength,
 		m_inputLayout.GetAddressOf());
-
-	//エフェクトファクトリの生成
-	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
-
-	//テクスチャの読み込みパスの指定
-	m_factory->SetDirectory(L"Resources");
-
-	//天球モデルの読み込み
-	m_objSkydome.LoadModel(L"Resources/Skydome.cmo");
 
 	//地面モデルの読み込み
 	m_objGround.LoadModel(L"Resources/Graund200m.cmo");
@@ -154,10 +144,8 @@ void Game::Update(DX::StepTimer const& timer)
 		m_proj = m_Camera->GetProj();
 	}
 
-	m_objSkydome.Update();
+	//地面の更新
 	m_objGround.Update();
-
-	//ModelEffectManager::getInstance()->Update();
 
 	//	デバッグ表示
 	//m_debugText->AddText(Vector2(0, 10), L"Reset:R Key");
@@ -260,8 +248,7 @@ void Game::Render()
 	m_d3dContext->RSSetState(m_states.CullNone());
 	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
 
-	//モデル（天球）の描画
-	m_objSkydome.Draw();
+	//地面の描画
 	m_objGround.Draw();
 
 	//プレイヤーの描画

@@ -1,12 +1,14 @@
+
+//多重インクルードの防止
 #pragma once
 
+//ヘッダファイルのインクルード
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include "Obj3d.h"
 #include "CollisionNode.h"
 #include "Player.h"
 #include "Strategy.h"
-
 
 class Enemy
 {
@@ -32,12 +34,6 @@ public:
 	//エネミーの挙動
 	void Action();
 
-	//ミサイルを発射する関数
-	void FireWeapon();
-
-	//ミサイルを再装着する関数
-	void ResetWeapon();
-
 	//エネミーの角度を取得する
 	const DirectX::SimpleMath::Vector3& GetRot() { return m_ObjEnemy[BODY].GetRotation(); };
 
@@ -53,7 +49,7 @@ public:
 	//エネミーの当たり判定を取得する
 	const SphereNode& GetCollisionNodeEnemy() { return m_CollisionNodeEnemy; }
 
-	//	エネミーのワールド座標
+	//エネミーのワールド座標
 	const DirectX::SimpleMath::Matrix& GetWorld() { return m_ObjEnemy[BODY].GetWorld(); }
 
 	//エネミーの角度をセットする
@@ -80,8 +76,10 @@ public:
 	
 	//	ホーミング辞書の取得
 	Homing** getHomingDictionary() { return m_homingDictionary; }
+
 	//	タイプの追加
 	void addStrategy(Homing::Type type);
+
 	//	実行する
 	void HomingExecute();
 
@@ -95,15 +93,6 @@ private:
 	//プレイヤー
 	Player* m_Player;
 
-	//タイマー
-	int m_Timer;
-
-	//ミサイル攻撃を管理するフラグ
-	bool m_weapon_flag;
-
-	//ミサイルの速度ベクトル
-	DirectX::SimpleMath::Vector3 m_weapon_speed;
-
 	//移動ベクトル
 	DirectX::SimpleMath::Vector3 m_moveV;
 
@@ -115,8 +104,6 @@ private:
 		R_WING,
 		L_ENGINE,
 		R_ENGINE,
-		L_WEAPON,
-		R_WEAPON,
 
 		ENEMY_PARTS_NUM
 	};
@@ -129,6 +116,7 @@ private:
 
 	//	各ホーミングの情報
 	Homing* m_homingDictionary[MAX_STRATEGY_NUM];
+
 	//	現在のタイプ
 	Homing::Type m_currentType;
 };

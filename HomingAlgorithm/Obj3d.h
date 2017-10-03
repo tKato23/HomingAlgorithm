@@ -1,5 +1,8 @@
+
+//多重インクルードの防止
 #pragma once
 
+//ヘッダファイルのインクルード
 #include <Windows.h>
 #include <wrl/client.h>
 #include <d3d11_1.h>
