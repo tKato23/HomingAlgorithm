@@ -425,13 +425,6 @@ void Enemy::addStrategy(Homing::Type type)
 	}
 }
 
-//待ち伏せ型の自動追尾
-void Enemy::AmbushHoming()
-{
-	//追尾対象(プレイヤー)へのベクトル
-	Vector3 TurnVec = m_Player->GetTrans() - this->GetTrans();
-}
-
 //	実行する
 void Enemy::HomingExecute()
 {

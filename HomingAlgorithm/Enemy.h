@@ -71,15 +71,6 @@ public:
 	//プレイヤーをセットする
 	void SetPlayer(Player* player) { m_Player = player; }
 
-	//追跡型の自動追尾
-	void PursuitHouming();
-
-	//先読み型の自動追尾
-	void PrefetchHoming();
-
-	//待ち伏せ型の自動追尾
-	void AmbushHoming();
-
 	//ホーミングのフラグをセットする
 	void SetHomingFlag(bool flag);
 
