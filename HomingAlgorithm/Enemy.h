@@ -2,7 +2,6 @@
 
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include <vector>
 #include "Obj3d.h"
 #include "CollisionNode.h"
 #include "Player.h"
@@ -12,9 +11,12 @@
 class Enemy
 {
 public:
+	//コンストラクタ
 	Enemy();
 
+	//デストラクタ
 	~Enemy();
+
 	//初期化処理
 	void Initialize();
 
@@ -29,6 +31,12 @@ public:
 
 	//エネミーの挙動
 	void Action();
+
+	//ミサイルを発射する関数
+	void FireWeapon();
+
+	//ミサイルを再装着する関数
+	void ResetWeapon();
 
 	//エネミーの角度を取得する
 	const DirectX::SimpleMath::Vector3& GetRot() { return m_ObjEnemy[BODY].GetRotation(); };
@@ -69,13 +77,13 @@ public:
 	//先読み型の自動追尾
 	void PrefetchHoming();
 
-	//	待ち伏せ型の自動追尾
+	//待ち伏せ型の自動追尾
 	void AmbushHoming();
 
-	//	ホーミングのフラグをセットする
+	//ホーミングのフラグをセットする
 	void SetHomingFlag(bool flag);
 
-	//	タイプの取得とセット
+	//タイプの取得とセット
 	Homing::Type getCurrentType() { return m_currentType; }
 	void SetHomingType(Homing::Type type) { m_currentType = type; }
 
@@ -87,29 +95,28 @@ public:
 	void IntervalHoming();
 
 private:
+	//定数宣言
+	static const float INTERVAL_SPACE;
+	static const float MOVE_SPEED;
+	static const int MAX_STRATEGY_NUM = 4;
 
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjEnemy;
 
-	//	プレイヤー
+	//プレイヤー
 	Player* m_Player;
-
-	//	定数
-
-	static const float MOVE_SPEED;
-	static const int MAX_STRATEGY_NUM = 4;
-
-	// サイン用の引数となる角度
-	float m_sinAngle;
 
 	//タイマー
 	int m_Timer;
 
+	//ミサイル攻撃を管理するフラグ
+	bool m_weapon_flag;
+
+	//ミサイルの速度ベクトル
+	DirectX::SimpleMath::Vector3 m_weapon_speed;
+
 	//移動ベクトル
 	DirectX::SimpleMath::Vector3 m_moveV;
-
-	//目標角度
-	float m_DistAngle;
 
 	//自機パーツ
 	enum ENEMYPARTS

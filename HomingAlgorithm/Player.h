@@ -7,21 +7,6 @@
 class Player
 {
 public:
-	//定数宣言
-	const float ROT_SPEED = 0.05f;				//機体の回転速度
-
-	//自機パーツ
-	enum PLAYERPARTS
-	{
-		BODY,
-		L_WING,
-		R_WING,
-		L_ENGINE,
-		R_ENGINE,
-
-		PLAYER_PARTS_NUM
-	};
-
 	//コンストラクタ
 	Player(DirectX::Keyboard* keyboard);
 
@@ -43,37 +28,40 @@ public:
 	//プレイヤーの挙動
 	void Action();
 
+	//ミサイルを発射する関数
+	void FireWeapon();
+
+	//ミサイルを再装着する関数
+	void ResetWeapon();
+
 	//プレイヤーの角度を取得する
-	const DirectX::SimpleMath::Vector3& GetRot();
+	const DirectX::SimpleMath::Vector3& GetRot() { return m_ObjPlayer[BODY].GetRotation(); }
 
 	//プレイヤーのクオータニオンを取得する
-	const DirectX::SimpleMath::Quaternion& GetRotQ();
+	const DirectX::SimpleMath::Quaternion& GetRotQ() { return m_ObjPlayer[BODY].GetRotationQ(); }
 
 	//プレイヤーの位置を取得する
-	const DirectX::SimpleMath::Vector3& GetTrans();
+	const DirectX::SimpleMath::Vector3& GetTrans() { return m_ObjPlayer[BODY].GetTranslation(); }
 
 	//プレイヤーのワールド行列を取得する
-	const DirectX::SimpleMath::Matrix& GetWor();
+	const DirectX::SimpleMath::Matrix& GetWor() { return m_ObjPlayer[BODY].GetWorld(); }
 
 	//プレイヤーの移動ベクトルを取得する
-	const DirectX::SimpleMath::Vector3& GetMoveV();
-
-	//プレイヤーの角度をセットする
-	void SetRot(const DirectX::SimpleMath::Vector3& rotation);
-
-	//プレイヤーの位置をセットする
-	void SetTrans(const DirectX::SimpleMath::Vector3& translation);
-
+	const DirectX::SimpleMath::Vector3& GetMoveV() { return m_moveV; }
+	
 	//プレイヤーの当たり判定(排斥処理用)を取得する
 	const SphereNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
 
-	//プレイヤーの当たり判定(くぐった時の判定用)を取得する
-	const SphereNode& GetCollisionNodeHit() { return m_CollisionNodeHit; }
+	//プレイヤーの角度をセットする
+	void SetRot(const DirectX::SimpleMath::Vector3& rotation) { m_ObjPlayer[BODY].SetRotation(rotation); }
 
-	//プレイヤーの速度を取得する
-	const DirectX::SimpleMath::Vector3 GetVelocity() { return m_Velocity; }
+	//プレイヤーの位置をセットする
+	void SetTrans(const DirectX::SimpleMath::Vector3& translation){ m_ObjPlayer[BODY].SetTranslation(translation); }
 
 private:
+	//定数宣言
+	const float ROT_SPEED = 0.05f;				//機体の回転速度
+
 	//自機の3Dオブジェクト
 	std::vector<Obj3d> m_ObjPlayer;
 
@@ -81,21 +69,29 @@ private:
 	DirectX::Keyboard* m_pKeyboard;
 	DirectX::Keyboard::KeyboardStateTracker m_KeyboardTracker;
 
-	// サイン用の引数となる角度
-	float m_sinAngle;
+	//ミサイル攻撃を管理するフラグ
+	bool m_weapon_flag;
+
+	//ミサイルの速度ベクトル
+	DirectX::SimpleMath::Vector3 m_weapon_speed;
+
+	//プレイヤーの移動ベクトル
+	DirectX::SimpleMath::Vector3 m_moveV;
+
+	//自機パーツ
+	enum PLAYERPARTS
+	{
+		BODY,
+		L_WING,
+		R_WING,
+		L_ENGINE,
+		R_ENGINE,
+		L_WEAPON,
+		R_WEAPON,
+
+		PLAYER_PARTS_NUM
+	};
 
 	//全身の当たり判定(排斥処理用)
 	SphereNode m_CollisionNodeBody;
-
-	//全身の当たり判定(くぐった時の判定用)
-	SphereNode m_CollisionNodeHit;
-
-	//速度
-	DirectX::SimpleMath::Vector3 m_Velocity;
-
-	//移動ベクトル
-	DirectX::SimpleMath::Vector3 m_moveV;
-
-	//前進速度
-	float m_speed;
 };
