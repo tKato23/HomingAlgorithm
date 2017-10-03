@@ -87,7 +87,7 @@ void Enemy::Initialize()
 	}
 
 	//	初期化として先読み型をセット
-	this->SetHomingType(Homing::Type::PURSUIT);
+	this->SetHomingType(Homing::Type::PREFETCH);
 
 }
 
@@ -107,15 +107,6 @@ void Enemy::Update()
 	//	プレイヤーへの追尾
 	if (m_homingFlag == true)
 	{
-		//	先読み型のホーミング
-		//PrefetchHoming();
-
-		//間合い確保型の自動追尾
-		//IntervalHoming();
-
-		//	待ち伏せ型の自動追尾
-		//AmbushHoming();
-
 		this->HomingExecute();
 	}
 
