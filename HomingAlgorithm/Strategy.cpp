@@ -99,6 +99,7 @@ void Ambush::homing(Player& player, Enemy& enemy)
 		Vector3 pos = enemy.GetTrans();
 		enemy.SetTrans(pos + TurnVec);
 
+		//	プレイヤーの方向を向くように回転
 		float angle = atan2f(TurnVec.x, TurnVec.z);
 		enemy.SetRot(Vector3(0.0f, angle + XM_PI, 0.0f));
 
@@ -146,6 +147,7 @@ void Pursuit::homing(Player& player, Enemy& enemy)
 		Vector3 pos = enemy.GetTrans();
 		enemy.SetTrans(pos + direction);
 
+		//	プレイヤーの方向に回転
 		float rot = atan2f(direction.x, direction.z);
 		enemy.SetRot(Vector3(0.0f, rot + XM_PI, 0.0f));
 	}
