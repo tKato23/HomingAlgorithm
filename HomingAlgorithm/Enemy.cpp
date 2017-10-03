@@ -30,11 +30,11 @@ void Enemy::Initialize()
 {
 	//自機パーツの読み込み
 	m_ObjEnemy.resize(ENEMY_PARTS_NUM);
-	m_ObjEnemy[BODY].LoadModel(L"Resources/body.cmo");
-	m_ObjEnemy[L_WING].LoadModel(L"Resources/LeftWing.cmo");
-	m_ObjEnemy[R_WING].LoadModel(L"Resources/RightWing.cmo");
-	m_ObjEnemy[L_ENGINE].LoadModel(L"Resources/Engine.cmo");
-	m_ObjEnemy[R_ENGINE].LoadModel(L"Resources/Engine.cmo");
+	m_ObjEnemy[BODY].LoadModel(L"Resources/E_body.cmo");
+	m_ObjEnemy[L_WING].LoadModel(L"Resources/E_leftwing.cmo");
+	m_ObjEnemy[R_WING].LoadModel(L"Resources/E_rightwing.cmo");
+	m_ObjEnemy[L_ENGINE].LoadModel(L"Resources/E_engine.cmo");
+	m_ObjEnemy[R_ENGINE].LoadModel(L"Resources/E_engine.cmo");
 	m_ObjEnemy[L_WEAPON].LoadModel(L"Resources/weapon.cmo");
 	m_ObjEnemy[R_WEAPON].LoadModel(L"Resources/weapon.cmo");
 
