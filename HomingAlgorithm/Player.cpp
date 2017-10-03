@@ -7,9 +7,8 @@ using namespace DirectX::SimpleMath;
 Player::Player(DirectX::Keyboard * keyboard)
 {
 	m_pKeyboard = keyboard;
-
-	m_sinAngle = 0.0f;
-	m_speed = 0.0f;
+	m_weapon_speed = Vector3::Zero;
+	m_weapon_flag = false;
 
 	Initialize();
 }
@@ -30,42 +29,36 @@ void Player::Initialize()
 	m_ObjPlayer[R_WING].LoadModel(L"Resources/RightWing.cmo");
 	m_ObjPlayer[L_ENGINE].LoadModel(L"Resources/Engine.cmo");
 	m_ObjPlayer[R_ENGINE].LoadModel(L"Resources/Engine.cmo");
+	m_ObjPlayer[L_WEAPON].LoadModel(L"Resources/weapon.cmo");
+	m_ObjPlayer[R_WEAPON].LoadModel(L"Resources/weapon.cmo");
 
 	//パーツを親子関係をセット
 	m_ObjPlayer[L_WING].SetParent(&m_ObjPlayer[BODY]);
-
 	m_ObjPlayer[R_WING].SetParent(&m_ObjPlayer[BODY]);
-
 	m_ObjPlayer[L_ENGINE].SetParent(&m_ObjPlayer[BODY]);
-
 	m_ObjPlayer[R_ENGINE].SetParent(&m_ObjPlayer[BODY]);
+	m_ObjPlayer[L_WEAPON].SetParent(&m_ObjPlayer[L_WING]);
+	m_ObjPlayer[R_WEAPON].SetParent(&m_ObjPlayer[R_WING]);
 
 	//親からのオフセット(座標のずらし分)をセット
 	m_ObjPlayer[BODY].SetTranslation(Vector3(0.0f, 1.0f, 0.0f));
-
 	m_ObjPlayer[L_WING].SetTranslation(Vector3(0.0f, 0.0f, 0.0f));
-
 	m_ObjPlayer[R_WING].SetTranslation(Vector3(0.0f, 0.0f, 0.0f));
-
 	m_ObjPlayer[L_ENGINE].SetTranslation(Vector3(-0.1f, 0.0f, 0.5f));
-
 	m_ObjPlayer[L_ENGINE].SetScale(Vector3(0.75f, 0.75f, 0.75f));
-
 	m_ObjPlayer[R_ENGINE].SetTranslation(Vector3(0.1f, 0.0f, 0.5f));
-
 	m_ObjPlayer[R_ENGINE].SetScale(Vector3(0.75f, 0.75f, 0.75f));
+	m_ObjPlayer[L_WEAPON].SetTranslation(Vector3(-0.5f, -0.05f, -0.025f));
+	m_ObjPlayer[L_WEAPON].SetScale(Vector3(0.75f, 0.75f, 0.6f));
+	m_ObjPlayer[R_WEAPON].SetTranslation(Vector3(0.5f, -0.05f, -0.025f));
+	m_ObjPlayer[R_WEAPON].SetScale(Vector3(0.75f, 0.75f, 0.6f));
+
 
 	//当たり判定を設定する(サークルとの排斥処理用)
 	m_CollisionNodeBody.Initialize();
 	m_CollisionNodeBody.SetParent(&m_ObjPlayer[BODY]);
 	m_CollisionNodeBody.SetTrans(Vector3(0, 0, 0.15f));
 	m_CollisionNodeBody.SetLocalRadius(Vector3(1.0f, 0.15f, 0.4f));
-
-	//当たり判定を設定する(サークルの中心との判定用)
-	m_CollisionNodeHit.Initialize();
-	m_CollisionNodeHit.SetParent(&m_ObjPlayer[L_ENGINE]);
-	m_CollisionNodeHit.SetTrans(Vector3(0, 0, 0.0f));
-	m_CollisionNodeHit.SetLocalRadius(Vector3(0.1f, 0.1f, 0.1f));
 }
 
 //更新処理
@@ -89,7 +82,6 @@ void Player::Calc()
 
 	//当たり判定の更新処理
 	m_CollisionNodeBody.Update();
-	m_CollisionNodeHit.Update();
 }
 
 //描画
@@ -118,9 +110,9 @@ void Player::Action()
 	m_KeyboardTracker.Update(keystate);
 
 	//現在の座標・回転角を取得
-	Vector3 trans = m_ObjPlayer[BODY].GetTranslation();
+	Vector3 trans = this->GetTrans();
 
-	//移動ベクトル(Z座標の前進)
+	//移動ベクトル
 	m_moveV = Vector3(0.0f, 0.0f, 0.0f);
 
 	//移動ベクトルを回転する
@@ -130,9 +122,9 @@ void Player::Action()
 	trans += m_moveV;
 
 	//移動した座標を反映
-	m_ObjPlayer[BODY].SetTranslation(trans);
+	this->SetTrans(trans);
 
-	//Wキーを押すと
+	//前進
 	if (keystate.W || keystate.Up)
 	{
 		//現在の座標・回転角を取得
@@ -149,17 +141,9 @@ void Player::Action()
 
 		//移動した座標を反映
 		m_ObjPlayer[BODY].SetTranslation(trans);
-
-		////現在の角度を取得
-		//Quaternion rot = m_ObjPlayer[BODY].GetRotationQ();
-		//Quaternion rotadd = Quaternion::CreateFromAxisAngle(Vector3::UnitX, ROT_SPEED);
-		//rot = rotadd * rot;
-
-		////回転後の角度を反映
-		//m_ObjPlayer[BODY].SetRotationQ(rot);
 	}
 
-	//Sキーを押すと
+	//後退
 	if (keystate.S || keystate.Down)
 	{
 		//現在の座標・回転角を取得
@@ -176,17 +160,9 @@ void Player::Action()
 
 		//移動した座標を反映
 		m_ObjPlayer[BODY].SetTranslation(trans);
-
-		////現在の角度を取得
-		//Quaternion rot = m_ObjPlayer[BODY].GetRotationQ();
-		//Quaternion rotadd = Quaternion::CreateFromAxisAngle(Vector3::UnitX, -ROT_SPEED);
-		//rot = rotadd * rot;
-
-		////回転後の角度を反映
-		//m_ObjPlayer[BODY].SetRotationQ(rot);
 	}
 
-	//Aキーを押すと
+	//左旋回
 	if (keystate.A || keystate.Left)
 	{
 		//現在の角度を取得
@@ -198,7 +174,7 @@ void Player::Action()
 		m_ObjPlayer[BODY].SetRotationQ(rot);
 	}
 
-	//Dキーを押すと
+	//右旋回
 	if (keystate.D || keystate.Right)
 	{
 		//現在の角度を取得
@@ -210,55 +186,88 @@ void Player::Action()
 		m_ObjPlayer[BODY].SetRotationQ(rot);
 	}
 
-	//スペースキーを押すと加速する
-	if (keystate.Space)
+	//ミサイル発射
+	if (m_KeyboardTracker.IsKeyPressed(Keyboard::Keys::Space))
 	{
-		m_speed = -0.4f;
+		if (m_weapon_flag)
+		{
+			ResetWeapon();
+		}
+		else
+		{
+			FireWeapon();
+		}
 	}
-	else
+
+	// 弾丸を前進させる
+	if (m_weapon_flag)
 	{
-		m_speed = -0.15f;
+		Vector3 pos_l = m_ObjPlayer[L_WEAPON].GetTranslation();
+		Vector3 pos_r = m_ObjPlayer[R_WEAPON].GetTranslation();
+
+		m_ObjPlayer[L_WEAPON].SetTranslation(pos_l + m_weapon_speed);
+		m_ObjPlayer[R_WEAPON].SetTranslation(pos_r + m_weapon_speed);
 	}
 }
 
-//プレイヤーの移動を取得する
-const DirectX::SimpleMath::Vector3& Player::GetRot()
+//ミサイルを発射する関数
+void Player::FireWeapon()
 {
-	return m_ObjPlayer[BODY].GetRotation();
+	m_weapon_flag = false;
+
+	//発射するパーツのワールド行列を取得
+	Matrix worldm_l = m_ObjPlayer[L_WEAPON].GetWorld();
+	Matrix worldm_r = m_ObjPlayer[R_WEAPON].GetWorld();
+
+	Vector3 scale_l;		//ワールドスケーリング(左ミサイル)
+	Vector3 scale_r;		//ワールドスケーリング(右ミサイル)
+
+	Quaternion rotation_l;	//ワールド回転(左ミサイル)
+	Quaternion rotation_r;	//ワールド回転(右ミサイル)
+
+	Vector3 translation_l;	//ワールド座標(左ミサイル)
+	Vector3 translation_r;	//ワールド座標(右ミサイル)
+
+	//ワールド行列から各要素を抽出
+	worldm_l.Decompose(scale_l, rotation_l, translation_l);
+	worldm_r.Decompose(scale_r, rotation_r, translation_r);
+
+	//発射パーツを親から分離して独立
+	m_ObjPlayer[L_WEAPON].SetParent(nullptr);
+	m_ObjPlayer[L_WEAPON].SetScale(scale_l);
+	m_ObjPlayer[L_WEAPON].SetRotationQ(rotation_l);
+	m_ObjPlayer[L_WEAPON].SetTranslation(translation_l);
+
+	m_ObjPlayer[R_WEAPON].SetParent(nullptr);
+	m_ObjPlayer[R_WEAPON].SetScale(scale_r);
+	m_ObjPlayer[R_WEAPON].SetRotationQ(rotation_r);
+	m_ObjPlayer[R_WEAPON].SetTranslation(translation_r);
+
+	//弾丸の速度を設定
+	m_weapon_speed = Vector3(0.0f, 0.0f, -0.1f);
+	m_weapon_speed = Vector3::Transform(m_weapon_speed, rotation_l);
+
+	m_weapon_flag = true;
 }
 
-//プレイヤーのクオータニオンを取得する
-const DirectX::SimpleMath::Quaternion & Player::GetRotQ()
+//ミサイルを再装着する関数
+void Player::ResetWeapon()
 {
-	return m_ObjPlayer[BODY].GetRotationQ();
-}
+	if (!m_weapon_flag)
+	{
+		return;
+	}
 
-//プレイヤーの角度を取得する
-const DirectX::SimpleMath::Vector3& Player::GetTrans()
-{
-	return m_ObjPlayer[BODY].GetTranslation();
-}
+	//親子関係とオフセットを初期値に戻す
+	m_ObjPlayer[L_WEAPON].SetParent(&m_ObjPlayer[L_WING]);
+	m_ObjPlayer[L_WEAPON].SetScale(Vector3(0.75f, 0.75f, 0.6f));
+	m_ObjPlayer[L_WEAPON].SetRotation(Vector3(0, 0, 0));
+	m_ObjPlayer[L_WEAPON].SetTranslation(Vector3(-0.5f, -0.05f, -0.025f));
 
-//プレイヤーのワールド行列を取得する
-const DirectX::SimpleMath::Matrix & Player::GetWor()
-{
-	return m_ObjPlayer[BODY].GetWorld();
-}
+	m_ObjPlayer[R_WEAPON].SetParent(&m_ObjPlayer[R_WING]);
+	m_ObjPlayer[R_WEAPON].SetScale(Vector3(0.75f, 0.75f, 0.6f));
+	m_ObjPlayer[R_WEAPON].SetRotation(Vector3(0, 0, 0));
+	m_ObjPlayer[R_WEAPON].SetTranslation(Vector3(0.5f, -0.05f, -0.025f));
 
-//プレイヤーの移動ベクトルを取得する
-const DirectX::SimpleMath::Vector3& Player::GetMoveV()
-{
-	return m_moveV;
-}
-
-//プレイヤーの移動をセットする
-void Player::SetRot(const Vector3& rotation)
-{
-	m_ObjPlayer[BODY].SetRotation(rotation);
-}
-
-//プレイヤーの角度をセットする
-void Player::SetTrans(const Vector3& translation)
-{
-	m_ObjPlayer[BODY].SetTranslation(translation);
+	m_weapon_flag = false;
 }
