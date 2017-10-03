@@ -5,8 +5,8 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 //	静的メンバ定数の定義
-const float Enemy::INTERVAL_SPACE = 2.5f;
-const float Enemy::MOVE_SPEED = -0.02f;
+//const float Enemy::INTERVAL_SPACE = 2.5f;
+//const float Enemy::MOVE_SPEED = 0.07f;
 
 //コンストラクタ
 Enemy::Enemy()
@@ -236,7 +236,7 @@ void Enemy::FireWeapon()
 	m_ObjEnemy[R_WEAPON].SetTranslation(translation_r);
 
 	//弾丸の速度を設定
-	m_weapon_speed = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
+	//m_weapon_speed = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
 	m_weapon_speed = Vector3::Transform(m_weapon_speed, rotation_l);
 
 	//追尾対象(プレイヤー)へのベクトル
@@ -461,42 +461,42 @@ void Enemy::HomingExecute()
 //間合い確保型の自動追尾
 void Enemy::IntervalHoming()
 {
-	//追尾対象(プレイヤー)へのベクトル
-	Vector3 Vec = m_Player->GetTrans() - this->GetTrans();
+	////追尾対象(プレイヤー)へのベクトル
+	//Vector3 Vec = m_Player->GetTrans() - this->GetTrans();
 
-	float distance_Square;
+	//float distance_Square;
 
-	distance_Square = Vec.x * Vec.x + Vec.y * Vec.y + Vec.z * Vec.z;
+	//distance_Square = Vec.x * Vec.x + Vec.y * Vec.y + Vec.z * Vec.z;
 
-	//半径の和の二乗
-	float radius_Square;
+	////半径の和の二乗
+	//float radius_Square;
 
-	radius_Square = INTERVAL_SPACE + INTERVAL_SPACE;
-	radius_Square = radius_Square * radius_Square;
+	//radius_Square = INTERVAL_SPACE + INTERVAL_SPACE;
+	//radius_Square = radius_Square * radius_Square;
 
-	//距離が半径の和より大きければ当たっていない
-	if (distance_Square > radius_Square)
-	{
-		//ベクトルの正規化
-		Vec.Normalize();
+	////距離が半径の和より大きければ当たっていない
+	//if (distance_Square > radius_Square)
+	//{
+	//	//ベクトルの正規化
+	//	Vec.Normalize();
 
-		//移動ベクトル
-		m_moveV = Vector3(0.07f, 0.07f, 0.07f);
+	//	//移動ベクトル
+	//	m_moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
 
-		//追尾対象へのベクトルに移動ベクトルを乗算する
-		Vec = Vec * m_moveV;
+	//	//追尾対象へのベクトルに移動ベクトルを乗算する
+	//	Vec = Vec * m_moveV;
 
-		//float angle_X = atan2f(Vec.z, Vec.y) - XM_PIDIV2;
-		float angle_Y = atan2f(Vec.x, Vec.z) + XM_PI;
-		//float angle_Z = atan2f(Vec.y, Vec.x);
+	//	//float angle_X = atan2f(Vec.z, Vec.y) - XM_PIDIV2;
+	//	float angle_Y = atan2f(Vec.x, Vec.z) + XM_PI;
+	//	//float angle_Z = atan2f(Vec.y, Vec.x);
 
-		this->SetRot(Vector3(0.0f, angle_Y, 0.0f));
+	//	this->SetRot(Vector3(0.0f, angle_Y, 0.0f));
 
-		//座標を移動させる
-		Vector3 pos = this->GetTrans();
-		this->SetTrans(pos + Vec);
-	}
-	//else
+	//	//座標を移動させる
+	//	Vector3 pos = this->GetTrans();
+	//	this->SetTrans(pos + Vec);
+	//}
+	//else if(distance_Square + 1.0f < radius_Square)
 	//{
 	//	//ベクトルの正規化
 	//	Vec.Normalize();
@@ -516,5 +516,10 @@ void Enemy::IntervalHoming()
 	//	//座標を移動させる
 	//	Vector3 pos = this->GetTrans();
 	//	this->SetTrans(pos - Vec);
+	//}
+	//else if(distance_Square >= radius_Square || distance_Square <= radius_Square)
+	//{
+	//	//移動ベクトル
+	//	m_moveV = Vector3(0.0f, 0.0f, 0.0f);
 	//}
 }

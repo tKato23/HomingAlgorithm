@@ -96,8 +96,6 @@ public:
 
 private:
 	//定数宣言
-	static const float INTERVAL_SPACE;
-	static const float MOVE_SPEED;
 	static const int MAX_STRATEGY_NUM = 4;
 
 	//自機の3Dオブジェクト

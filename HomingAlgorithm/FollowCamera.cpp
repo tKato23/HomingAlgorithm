@@ -51,7 +51,7 @@ void FollowCamera::Update()
 	{
 		//Vector3 refvec = Vector3(-5.0f, 3.0f, 2.0f);
 
-		Vector3 refvec = Vector3(1.0f, 3.0f, 1.0f);
+		Vector3 refvec = Vector3(0.0f, 3.0f, 0.0f);
 
 		//refvec = Vector3::TransformNormal(refvec, m_targetWorld);
 
@@ -60,7 +60,7 @@ void FollowCamera::Update()
 		// 参照点と視点の差分ベクトル
 
 		//Vector3 cameraV(5.0f, 10.0f, 10.0f);
-		Vector3 cameraV(1.0f, 20.0f, 1.0f);
+		Vector3 cameraV(0.0f, 20.0f, 10.0f);
 
 		// 差分ベクトルを回転させる
 		//cameraV = Vector3::TransformNormal(cameraV, m_targetWorld);

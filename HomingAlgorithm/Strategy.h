@@ -45,6 +45,11 @@ class Interval :public Homing
 {
 public:
 	void homing(Player& player, Enemy& enemy) override;
+
+private:
+	//定数宣言
+	static const float INTERVAL_SPACE;
+	static const float MOVE_SPEED;
 };
 
 //	待ち伏せ型ホーミング

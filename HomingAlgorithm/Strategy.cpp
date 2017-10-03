@@ -15,6 +15,10 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+//	静的メンバ定数の定義
+const float Interval::INTERVAL_SPACE = 2.5f;
+const float Interval::MOVE_SPEED = 0.07f;
+
 //	先読み型ホーミング
 void Prefetch::homing(Player& player, Enemy& enemy)
 {
@@ -55,6 +59,9 @@ void Prefetch::homing(Player& player, Enemy& enemy)
 
 	pos = pos * moveV;
 
+	float angle_Y = atan2f(pos.x, pos.z) + XM_PI;
+	enemy.SetRot(Vector3(0.0f, angle_Y, 0.0f));
+
 	//	敵に反映させる
 	enemy.SetTrans(enemy.GetTrans() + pos);
 }
@@ -63,17 +70,60 @@ void Prefetch::homing(Player& player, Enemy& enemy)
 void Interval::homing(Player& player, Enemy& enemy)
 {
 	//追尾対象(プレイヤー)へのベクトル
-	Vector3 TurnVec = player.GetTrans() - enemy.GetTrans();
+	Vector3 Vec = player.GetTrans() - enemy.GetTrans();
 
-	//ベクトルの正規化
-	TurnVec.Normalize();
+	float distance_Square;
 
-	//追尾対象へのベクトルに移動ベクトルを乗算する
-	TurnVec = TurnVec * enemy.GetMoveV();
+	distance_Square = Vec.x * Vec.x + Vec.y * Vec.y + Vec.z * Vec.z;
 
-	//座標を移動させる
-	Vector3 pos = enemy.GetTrans();
-	enemy.SetTrans(pos + TurnVec);
+	//半径の和の二乗
+	float radius_Square;
+
+	radius_Square = INTERVAL_SPACE + INTERVAL_SPACE;
+	radius_Square = radius_Square * radius_Square;
+
+	//距離が半径の和より大きければ当たっていない
+	if (distance_Square > radius_Square)
+	{
+		//ベクトルの正規化
+		Vec.Normalize();
+
+		//移動ベクトル
+		Vector3 moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
+
+		//追尾対象へのベクトルに移動ベクトルを乗算する
+		Vec = Vec * moveV;
+
+		float angle_Y = atan2f(Vec.x, Vec.z) + XM_PI;
+		enemy.SetRot(Vector3(0.0f, angle_Y, 0.0f));
+
+		//座標を移動させる
+		Vector3 pos = enemy.GetTrans();
+		enemy.SetTrans(pos + Vec);
+	}
+	else if (distance_Square + 1.0f < radius_Square)
+	{
+		//ベクトルの正規化
+		Vec.Normalize();
+
+		//移動ベクトル
+		Vector3 moveV = Vector3(MOVE_SPEED, MOVE_SPEED, MOVE_SPEED);
+
+		//追尾対象へのベクトルに移動ベクトルを乗算する
+		Vec = Vec * moveV;
+
+		float angle_Y = atan2f(Vec.x, Vec.z) + XM_PI;
+		enemy.SetRot(Vector3(0.0f, angle_Y, 0.0f));
+
+		//座標を移動させる
+		Vector3 pos = enemy.GetTrans();
+		enemy.SetTrans(pos - Vec);
+	}
+	else if (distance_Square >= radius_Square || distance_Square <= radius_Square)
+	{
+		//移動ベクトル
+		Vector3 moveV = Vector3(0.0f, 0.0f, 0.0f);
+	}
 }
 
 //	待ち伏せ型ホーミング

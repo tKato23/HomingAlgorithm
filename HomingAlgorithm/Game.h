@@ -51,9 +51,6 @@ public:
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
 
-	//	デバッグのため敵をプレイヤーから一定距離離す
-	void separateEnemy();
-
 private:
     void Update(DX::StepTimer const& timer);
     void Render();
@@ -109,9 +106,6 @@ private:
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 	DirectX::Keyboard::KeyboardStateTracker m_tracker;
 
-	////地形データのポインタ配列
-	//std::vector<LandShape*> m_landShapeArray;
-
 	//モデル(天球)
 	Obj3d m_objSkydome;
 
@@ -123,10 +117,4 @@ private:
 
 	//カメラ
 	std::unique_ptr<FollowCamera> m_Camera;
-
-	////地形(地面)
-	//LandShape m_landshape_ground;
-
-	////地形(空)
-	//LandShape m_landshape_sky;
 };
