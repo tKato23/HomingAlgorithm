@@ -178,7 +178,8 @@ void Game::Update(DX::StepTimer const& timer)
 		m_Player->SetRot(Vector3::Zero);
 		m_Enemy->SetTrans(Vector3(-20.0f, 0.0f, -20.0f));
 		m_Enemy->SetRot(Vector3::Zero);
-
+		m_Player->SetRotQ(Quaternion(0.0f, 0.0f, 0.0f, 1.0f));
+		
 		//	ホーミングのフラグをオフにする
 		m_Enemy->SetHomingFlag(false);
 	}

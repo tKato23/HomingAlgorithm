@@ -52,6 +52,9 @@ public:
 	//プレイヤーの角度をセットする
 	void SetRot(const DirectX::SimpleMath::Vector3& rotation) { m_ObjPlayer[BODY].SetRotation(rotation); }
 
+	//プレイヤーのクオータニオンをセットする
+	void SetRotQ(const DirectX::SimpleMath::Quaternion& quaternion) { m_ObjPlayer[BODY].SetRotationQ(quaternion); }
+
 	//プレイヤーの位置をセットする
 	void SetTrans(const DirectX::SimpleMath::Vector3& translation){ m_ObjPlayer[BODY].SetTranslation(translation); }
 
