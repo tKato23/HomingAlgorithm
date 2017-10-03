@@ -29,6 +29,7 @@ public:
 		PURSUIT
 	};
 
+	//	ƒˆ‰¼‘zŠÖ”
 	virtual void homing(Player& player, Enemy& enemy) = 0;
 };
 
