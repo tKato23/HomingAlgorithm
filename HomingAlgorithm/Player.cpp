@@ -9,7 +9,6 @@ using namespace DirectX::SimpleMath;
 Player::Player(DirectX::Keyboard * keyboard)
 {
 	m_pKeyboard = keyboard;
-
 	Initialize();
 }
 
